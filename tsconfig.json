@@ -1,0 +1,11 @@
+{
+    "compilerOptions": {
+        "strict": true,
+        "removeComments": true,
+        "target": "es5",
+        "outDir": "./dist"
+    },
+    "files": [
+        "./src/forth.ts"
+    ]
+}
