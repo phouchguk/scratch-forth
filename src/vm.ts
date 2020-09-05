@@ -81,6 +81,19 @@ export class Vm {
         return;
 
       case 6: // next
+        // count is on the return stack
+        const count = this.mem.get16(this.mem.RP) - 1;
+
+        if (count < 0) {
+          // when count goes below 0, pop the count, skip over address after 'next' instruction
+          this.stack.popr();
+          this.mem.PC += CELLL;
+        } else {
+          // otherwise set the dec'd count, jump to address after next instruction
+          this.mem.set16(this.mem.RP, count);
+          this.mem.PC = this.mem.get16(this.mem.PC);
+        }
+
         return;
 
       case 7: // ?branch
