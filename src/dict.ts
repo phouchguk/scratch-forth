@@ -4,7 +4,7 @@ function align(n: number): number {
   const offset = n % CELLL;
 
   if (offset === 0) {
-     return n;
+    return n;
   }
 
   return n + (CELLL - offset);
@@ -82,6 +82,5 @@ export class Dict {
       this.mem.set16(this.cp, code[i]);
       this.cp += CELLL;
     }
-
   }
 }

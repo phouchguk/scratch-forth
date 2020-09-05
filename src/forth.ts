@@ -38,8 +38,8 @@ function ptr(dicti) {
 function step() {
   const op = dict[pc.dicti][pc.i++];
 
-    // primitive
-    switch (op) {
+  // primitive
+  switch (op) {
     case 0: // EXIT
       if (rs.length === 0) {
         pc = null;
@@ -74,7 +74,7 @@ function step() {
       // run compound proc
       rs.push(pc);
       pc = ptr(op);
-    }
+  }
 }
 
 function run() {
@@ -94,14 +94,14 @@ function compile(x) {
   return n;
 }
 
-const trim = s => s.trim();
+const trim = (s) => s.trim();
 
 function parse(s) {
   return (s + " EXIT").split(" ").map(trim).map(compile);
 }
 
 // compounds
-const add5n = "ADD5"
+const add5n = "ADD5";
 const add5 = "doLIT 5 +";
 const add5c = parse(add5);
 
