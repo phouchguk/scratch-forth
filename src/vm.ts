@@ -59,6 +59,7 @@ export class Vm {
         return;
 
       case 1: // RX
+        this.stack.pushd("?".charCodeAt(0)); // should stop vm and wait for input
         return;
 
       case 2: // TX!
