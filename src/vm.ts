@@ -1,7 +1,7 @@
 import { CELLL, Mem } from "./mem";
 import { Stack } from "./stack";
 
-export const prims = ["BYE", "EXIT", "doLIT", "!", "@", "+", "."];
+export const prims = ["BYE", "RX", "TX!", "doLIT", "EXIT", "EXECUTE", "next", "branch?", "branch", "!", "@", "C!", "C@", "RP@", "RP!", "R>", "R@", ">R", "SP@", "SP!", "DROP", "DUP", "SWAP", "OVER", "0<", "AND", "OR", "XOR", "UM+"];
 export const primCount = prims.length;
 
 export class Vm {
@@ -24,30 +24,120 @@ export class Vm {
         this.running = false;
         return;
 
-      case 1: // EXIT
-        this.mem.PC = this.stack.popr();
+      case 1: // RX
         return;
 
-      case 2: // doLIT
+      case 2: // TX!
+        const c = this.stack.popd();
+        console.log(c); // needs to presume char
+        return;
+
+      case 3: // doLIT
         this.stack.pushd(this.mem.get16(this.mem.PC));
         this.mem.PC += CELLL;
         return;
 
-      case 3: // !
+      case 4: // EXIT
+        this.mem.PC = this.stack.popr();
+        return;
+
+      case 5: // EXECUTE
+        this.mem.PC = this.stack.popd();
+        return;
+
+      case 6: // next
+        return;
+
+      case 7: // branch?
+        return;
+
+      case 8: // branch
+        return;
+
+      case 9: // !
+      {
         const addr = this.stack.popd();
         this.mem.set16(addr, this.stack.popd());
         return;
+      }
 
-      case 4: // @
+      case 10: // @
         this.stack.pushd(this.mem.get16(this.stack.popd()));
         return;
 
-      case 5: // +
-        this.stack.pushd(this.stack.popd() + this.stack.popd());
+      case 11: // C!
+      {
+        const addr = this.stack.popd();
+        this.mem.set8(addr, this.stack.popd());
+        return;
+      }
+
+      case 12: // C@
+        this.stack.pushd(this.mem.get8(this.stack.popd()));
         return;
 
-      case 6: // .
-        console.log(this.stack.popd());
+      case 13: // RP@
+        this.stack.pushd(this.mem.RP);
+        return;
+
+      case 14: // RP!
+        this.mem.RP = this.stack.popd();
+        return;
+
+      case 15: // R>
+        this.stack.pushd(this.stack.popr());
+        return;
+
+      case 16: // R@
+        this.stack.pushd(this.mem.get16(this.mem.RP));
+        return;
+
+      case 17: // >R
+        this.stack.pushr(this.stack.popd());
+        return;
+
+      case 18: // SP@
+        this.stack.pushd(this.mem.SP);
+        return;
+
+      case 19: // SP!
+        this.mem.SP = this.stack.popd();
+        return;
+
+      case 20: // DROP
+        this.stack.popd();
+        return;
+
+      case 21: // DUP
+        this.stack.pushd(this.mem.get16(this.mem.SP));
+        return;
+
+      case 22: // SWAP
+        const temp1 = this.stack.popd();
+        const temp2 = this.stack.popd();
+        this.stack.pushd(temp1);
+        this.stack.pushd(temp2);
+
+        return;
+
+      case 23: // OVER
+        this.stack.pushd(this.mem.get16(this.mem.SP - CELLL));
+        return;
+
+      case 24: // 0<
+        return;
+
+      case 25: // AND
+        return;
+
+      case 26: // OR
+        return;
+
+      case 27: // XOR
+        return;
+
+      case 28: // UM+
+        this.stack.pushd(this.stack.popd() + this.stack.popd());
         return;
 
       default:

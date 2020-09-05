@@ -1,2 +1,2 @@
-ADD5 doLIT 5 + EXIT
-START doLIT 1 ADD5 doLIT 6 ! doLIT 6 @ doLIT 3 + doLIT 6 @ + . BYE
+ADD5 doLIT 5 UM+ EXIT
+START doLIT 1 ADD5 doLIT 6 ! doLIT 6 @ doLIT 3 UM+ doLIT 6 @ UM+ TX! BYE
