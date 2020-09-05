@@ -1,15 +1,17 @@
 import { Mem } from "./mem";
+import { Stack } from "./stack";
 
 const mem = new Mem();
+const stack = new Stack(mem);
 
 const prims = ["EXIT", "doLIT", "!", "@", "+", "."];
 const primCount = prims.length;
 
 const dict = [];
 
-let pc = null;
-const ds = [];
 const rs = [];
+
+let pc = null;
 
 // add prims
 for (let i = 0; i < primCount; i++) {
@@ -18,7 +20,6 @@ for (let i = 0; i < primCount; i++) {
 
 // add compounds
 dict.push(["ADD5", 1, 5, 4, 0]);
-
 
 function lookup(name) {
   for (let i = dict.length - 1; i >= 0; i--) {
@@ -37,7 +38,6 @@ function ptr(dicti) {
 function step() {
   const op = dict[pc.dicti][pc.i++];
 
-  if (op < primCount) {
     // primitive
     switch (op) {
     case 0: // EXIT
@@ -50,34 +50,31 @@ function step() {
       return;
 
     case 1: // doLIT
-      ds.push(dict[pc.dicti][pc.i++]);
+      stack.pushd(dict[pc.dicti][pc.i++]);
       return;
 
     case 2: // !
-      const addr = ds.pop();
-      mem.set16(addr, ds.pop());
+      const addr = stack.popd();
+      mem.set16(addr, stack.popd());
       return;
 
     case 3: // @
-      ds.push(mem.get16(ds.pop()));
+      stack.pushd(mem.get16(stack.popd()));
       return;
 
     case 4: // +
-      ds.push(ds.pop() + ds.pop());
+      stack.pushd(stack.popd() + stack.popd());
       return;
 
     case 5: // .
-      console.log(ds.pop());
+      console.log(stack.popd());
       return;
 
     default:
-      throw new Error(`prim? ${op}`);
+      // run compound proc
+      rs.push(pc);
+      pc = ptr(op);
     }
-  }
-
-  // run compound proc
-  rs.push(pc);
-  pc = ptr(op);
 }
 
 function run() {
