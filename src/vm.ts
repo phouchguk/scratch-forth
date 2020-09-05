@@ -1,7 +1,41 @@
 import { CELLL, Mem } from "./mem";
 import { Stack } from "./stack";
 
-export const prims = ["BYE", "RX", "TX!", "doLIT", "EXIT", "EXECUTE", "next", "branch?", "branch", "!", "@", "C!", "C@", "RP@", "RP!", "R>", "R@", ">R", "SP@", "SP!", "DROP", "DUP", "SWAP", "OVER", "0<", "AND", "OR", "XOR", "UM+"];
+const minus1 = Math.pow(2, CELLL * 8) - 1;
+const signFlag = 1 << (CELLL * 8 - 1);
+
+export const prims = [
+  "BYE",
+  "RX",
+  "TX!",
+  "doLIT",
+  "EXIT",
+  "EXECUTE",
+  "next",
+  "branch?",
+  "branch",
+  "!",
+  "@",
+  "C!",
+  "C@",
+  "RP@",
+  "RP!",
+  "R>",
+  "R@",
+  ">R",
+  "SP@",
+  "SP!",
+  "DROP",
+  "DUP",
+  "SWAP",
+  "OVER",
+  "0<",
+  "AND",
+  "OR",
+  "XOR",
+  "UM+",
+];
+
 export const primCount = prims.length;
 
 export class Vm {
@@ -54,8 +88,7 @@ export class Vm {
       case 8: // branch
         return;
 
-      case 9: // !
-      {
+      case 9: { // !
         const addr = this.stack.popd();
         this.mem.set16(addr, this.stack.popd());
         return;
@@ -65,8 +98,7 @@ export class Vm {
         this.stack.pushd(this.mem.get16(this.stack.popd()));
         return;
 
-      case 11: // C!
-      {
+      case 11: { // C!
         const addr = this.stack.popd();
         this.mem.set8(addr, this.stack.popd());
         return;
@@ -125,6 +157,8 @@ export class Vm {
         return;
 
       case 24: // 0<
+        const test = this.stack.popd();
+        this.stack.pushd(test & signFlag ? minus1 : 0);
         return;
 
       case 25: // AND

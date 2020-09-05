@@ -6,15 +6,15 @@ import { Dict } from "./dict";
 
 let dictm: Dict | null = null;
 
-function compile(x: string) {
-  const n = parseInt(x, 10);
+const isNr = /^-?\d+$/;
 
-  if (isNaN(n)) {
-    const pi = prims.indexOf(x);
-    return pi > -1 ? pi : (dictm as Dict).lookup(x);
+function compile(x: string) {
+  if (isNr.test(x)) {
+    return parseInt(x, 10);
   }
 
-  return n;
+  const pi = prims.indexOf(x);
+  return pi > -1 ? pi : (dictm as Dict).lookup(x);
 }
 
 const trim = (s: string) => s.trim();
