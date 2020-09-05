@@ -177,16 +177,21 @@ export class Vm {
         return;
 
       case 25: // AND
+        this.stack.pushd(this.stack.popd() & this.stack.popd());
         return;
 
       case 26: // OR
+        this.stack.pushd(this.stack.popd() | this.stack.popd());
         return;
 
       case 27: // XOR
+        this.stack.pushd(this.stack.popd() ^ this.stack.popd());
         return;
 
       case 28: // UM+
-        this.stack.pushd(this.stack.popd() + this.stack.popd());
+        const result = this.stack.popd() + this.stack.popd();
+        this.stack.pushd(result);
+        this.stack.pushd(result > minus1 ? minus1 : 0);
         return;
 
       default:
