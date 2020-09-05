@@ -1,8 +1,8 @@
 import { readFile, writeFile } from "fs";
 
-import { Mem } from "./mem";
+import { CELLL, Mem } from "./mem";
 import { prims, primCount } from "./vm";
-import { Dict } from "./dict";
+import { labelOffset, Dict } from "./dict";
 
 let dictm: Dict | null = null;
 
@@ -25,7 +25,34 @@ function parse(l: string) {
   }
 
   const parts = l.split(" ").map(trim);
-  (dictm as Dict).add(parts[0], parts.slice(1).map(compile));
+  const name = parts[0];
+  const code: string[] = [];
+  const insts = parts.slice(1);
+  const labels: { [key: string]: number } = {};
+
+  // extract labels
+  for (let i = 0; i < insts.length; i++) {
+    const inst = insts[i];
+    if (inst.endsWith(":")) {
+      // inst is a label
+      labels[inst.substring(0, inst.length - 1)] = code.length * CELLL;
+
+      // don't keep label
+      continue;
+    }
+
+    code.push(insts[i]);
+  }
+
+  for (let i = 0; i < code.length; i++) {
+    const inst = code[i];
+
+    if (labels[inst]) {
+      code[i] = labelOffset + labels[inst] + "";
+    }
+  }
+
+  (dictm as Dict).add(name, code.map(compile));
 }
 
 export function build(cb: (mem: Mem) => void) {

@@ -10,6 +10,8 @@ function align(n: number): number {
   return n + (CELLL - offset);
 }
 
+export const labelOffset = 65536;
+
 export class Dict {
   private mem: Mem;
   private cp: number;
@@ -77,9 +79,14 @@ export class Dict {
     // align
     this.cp = align(this.cp);
 
+    const codeStart = this.cp;
+
     // code
     for (let i = 0; i < code.length; i++) {
-      this.mem.set16(this.cp, code[i]);
+      this.mem.set16(
+        this.cp,
+        code[i] > labelOffset ? codeStart + code[i] - labelOffset : code[i]
+      );
       this.cp += CELLL;
     }
   }

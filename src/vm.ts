@@ -12,7 +12,7 @@ export const prims = [
   "EXIT",
   "EXECUTE",
   "next",
-  "branch?",
+  "?branch",
   "branch",
   "!",
   "@",
@@ -82,13 +82,26 @@ export class Vm {
       case 6: // next
         return;
 
-      case 7: // branch?
+      case 7: // ?branch
+        const flag = this.stack.popd();
+
+        if (flag === 0) {
+          // branch
+          this.mem.PC = this.mem.get16(this.mem.PC);
+        } else {
+          // don't branch, skip branch address
+          this.mem.PC += CELLL;
+        }
+
         return;
 
       case 8: // branch
+        this.mem.PC = this.mem.get16(this.mem.PC);
+        this.mem.PC += CELLL;
         return;
 
-      case 9: { // !
+      case 9: {
+        // !
         const addr = this.stack.popd();
         this.mem.set16(addr, this.stack.popd());
         return;
@@ -98,7 +111,8 @@ export class Vm {
         this.stack.pushd(this.mem.get16(this.stack.popd()));
         return;
 
-      case 11: { // C!
+      case 11: {
+        // C!
         const addr = this.stack.popd();
         this.mem.set8(addr, this.stack.popd());
         return;
