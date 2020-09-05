@@ -1,9 +1,8 @@
-import { writeFile } from "fs";
+import { readFile, writeFile } from "fs";
 
 import { CELLL, Mem } from "./mem";
 import { prims, primCount } from "./vm";
 import { labelOffset, Dict } from "./dict";
-import { code } from "./prelude";
 
 let dictm: Dict | null = null;
 
@@ -60,17 +59,16 @@ export function build(cb: (mem: Mem) => void) {
   const mem = new Mem();
   dictm = new Dict(primCount, mem);
 
-  code.map(trim).forEach(parse);
-
-  mem.PC = (dictm as Dict).lookup("START");
-
-  cb(mem);
-
-  /*
-  readFile("src/code.txt", { encoding: "utf8" }, function (err, data: string) {
+  readFile("src/prelude.txt", { encoding: "utf8" }, function (
+    err,
+    data: string
+  ) {
     const lines = data.split("\n");
+
+    lines.map(trim).forEach(parse);
+    mem.PC = (dictm as Dict).lookup("START");
+    cb(mem);
   });
-  */
 }
 
 export function dump(mem: Mem) {
