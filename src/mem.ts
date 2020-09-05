@@ -1,5 +1,6 @@
 export const CELLL = 2;
 export const EM = 0x4000;
+export const REG_TOP = 5 * CELLL;
 
 export class Mem {
   mem: ArrayBuffer;

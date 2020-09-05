@@ -1,11 +1,14 @@
 import { Mem } from "./mem";
 import { Stack } from "./stack";
+import { Dict } from "./dict";
 
 const mem = new Mem();
 const stack = new Stack(mem);
 
 const prims = ["EXIT", "doLIT", "!", "@", "+", "."];
 const primCount = prims.length;
+
+const dictm = new Dict(primCount, mem);
 
 const dict = [];
 
@@ -17,9 +20,6 @@ let pc = null;
 for (let i = 0; i < primCount; i++) {
   dict.push([prims[i], i]);
 }
-
-// add compounds
-dict.push(["ADD5", 1, 5, 4, 0]);
 
 function lookup(name) {
   for (let i = dict.length - 1; i >= 0; i--) {
@@ -87,7 +87,8 @@ function compile(x) {
   const n = parseInt(x, 10);
 
   if (isNaN(n)) {
-    return lookup(x);
+    const pi = prims.indexOf(x);
+    return pi > -1 ? pi : lookup(x);
   }
 
   return n;
@@ -99,13 +100,27 @@ function parse(s) {
   return (s + " EXIT").split(" ").map(trim).map(compile);
 }
 
+// compounds
+const add5n = "ADD5"
+const add5 = "doLIT 5 +";
+const add5c = parse(add5);
+
+dictm.add(add5n, add5c);
+add5c.unshift(add5n);
+dict.push(add5c);
+
 pc = ptr(dict.length);
 
+const testn = "TEST";
 const test = "doLIT 1 ADD5 doLIT 6 ! doLIT 6 @ doLIT 2 + doLIT 6 @ + .";
-const code = parse(test);
-code.unshift("TEST");
-dict.push(code);
+const testc = parse(test);
+dictm.add(testn, testc);
+testc.unshift(testn);
+dict.push(testc);
 
 run();
 
 dict.pop();
+
+console.log(dictm.lookup(testn));
+console.log(dictm.lookup(add5n));
