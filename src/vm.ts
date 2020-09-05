@@ -181,7 +181,7 @@ export class Vm {
         return;
 
       case 23: // OVER
-        this.stack.pushd(this.mem.get16(this.mem.SP - CELLL));
+        this.stack.pushd(this.mem.get16(this.mem.SP + CELLL));
         return;
 
       case 24: // 0<
