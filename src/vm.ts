@@ -1,6 +1,9 @@
 import { CELLL, Mem } from "./mem";
 import { Stack } from "./stack";
 
+export const prims = ["BYE", "EXIT", "doLIT", "!", "@", "+", "."];
+export const primCount = prims.length;
+
 export class Vm {
   private mem: Mem;
   private stack: Stack;
