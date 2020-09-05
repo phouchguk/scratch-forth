@@ -1,8 +1,11 @@
+import { Mem } from "./mem";
+
+const mem = new Mem();
+
 const prims = ["EXIT", "doLIT", "!", "@", "+", "."];
 const primCount = prims.length;
 
 const dict = [];
-const mem = [];
 
 let pc = null;
 const ds = [];
@@ -51,11 +54,12 @@ function step() {
       return;
 
     case 2: // !
-      mem[ds.pop()] = ds.pop();
+      const addr = ds.pop();
+      mem.set16(addr, ds.pop());
       return;
 
     case 3: // @
-      ds.push(mem[ds.pop()]);
+      ds.push(mem.get16(ds.pop()));
       return;
 
     case 4: // +
@@ -100,7 +104,7 @@ function parse(s) {
 
 pc = ptr(dict.length);
 
-const test = "doLIT 1 ADD5 doLIT 5 ! doLIT 5 @ doLIT 2 + doLIT 5 @ + .";
+const test = "doLIT 1 ADD5 doLIT 6 ! doLIT 6 @ doLIT 2 + doLIT 6 @ + .";
 const code = parse(test);
 code.unshift("TEST");
 dict.push(code);
@@ -108,4 +112,3 @@ dict.push(code);
 run();
 
 dict.pop();
-console.log(mem);
