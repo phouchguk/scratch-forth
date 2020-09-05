@@ -77,6 +77,7 @@ export class Vm {
         return;
 
       case 5: // EXECUTE
+        this.stack.pushr(this.mem.PC);
         this.mem.PC = this.stack.popd();
         return;
 
@@ -181,6 +182,7 @@ export class Vm {
         return;
 
       case 23: // OVER
+        // stack grows down, the previous cell is up
         this.stack.pushd(this.mem.get16(this.mem.SP + CELLL));
         return;
 
