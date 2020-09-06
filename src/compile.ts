@@ -8,13 +8,28 @@ let dictm: Dict | null = null;
 
 const isNr = /^-?\d+$/;
 
+const vars: { [key: string]: number } = {};
+
+vars["UPP"] = primCount;
+
 function compile(x: string) {
   if (isNr.test(x)) {
     return parseInt(x, 10);
   }
 
   const pi = prims.indexOf(x);
-  return pi > -1 ? pi : (dictm as Dict).lookup(x);
+
+  if (pi > -1) {
+    // primitive
+    return pi;
+  }
+
+  if (vars[x]) {
+    // variable
+    return vars[x];
+  }
+
+  return (dictm as Dict).lookup(x);
 }
 
 const trim = (s: string) => s.trim();
@@ -52,7 +67,7 @@ function parse(l: string) {
     }
   }
 
-  (dictm as Dict).add(name, code.map(compile));
+  (dictm as Dict).colon(name, code.map(compile));
 }
 
 export function build(cb: (mem: Mem) => void) {

@@ -1,5 +1,8 @@
 import { CELLL, REG_TOP, Mem } from "./mem";
 
+const upp = REG_TOP;
+const codeStart = 256;
+
 function align(n: number): number {
   const offset = n % CELLL;
 
@@ -60,7 +63,7 @@ export class Dict {
     throw new Error(`${name}?`);
   }
 
-  add(name: string, code: number[]) {
+  code(name: string) {
     const len = name.length;
 
     // addr of previous entry
@@ -78,15 +81,20 @@ export class Dict {
 
     // align
     this.cp = align(this.cp);
+  }
+
+  colon(name: string, ops: number[]) {
+    this.code(name);
 
     const codeStart = this.cp;
 
-    // code
-    for (let i = 0; i < code.length; i++) {
+    // ops
+    for (let i = 0; i < ops.length; i++) {
       this.mem.set16(
         this.cp,
-        code[i] > labelOffset ? codeStart + code[i] - labelOffset : code[i]
+        ops[i] > labelOffset ? codeStart + ops[i] - labelOffset : ops[i]
       );
+
       this.cp += CELLL;
     }
   }
