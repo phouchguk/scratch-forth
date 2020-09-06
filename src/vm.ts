@@ -90,7 +90,7 @@ export class Vm {
           this.stack.popr();
           this.mem.PC += CELLL;
         } else {
-          // otherwise set the dec'd count, jump to address after next instruction
+          // otherwise set the dec'd count, jump to address after 'next' instruction
           this.mem.set16(this.mem.RP, count);
           this.mem.PC = this.mem.get16(this.mem.PC);
         }
@@ -112,7 +112,6 @@ export class Vm {
 
       case 8: // branch
         this.mem.PC = this.mem.get16(this.mem.PC);
-        this.mem.PC += CELLL;
         return;
 
       case 9: {
@@ -204,9 +203,11 @@ export class Vm {
         return;
 
       case 28: // UM+
-        const result = this.stack.popd() + this.stack.popd();
-        this.stack.pushd(result);
-        this.stack.pushd(result > minus1 ? minus1 : 0);
+        let bx = this.stack.popd();
+        let ax = this.stack.popd() + bx;
+
+        this.stack.pushd(ax & minus1);
+        this.stack.pushd(ax >> 16);
         return;
 
       default:

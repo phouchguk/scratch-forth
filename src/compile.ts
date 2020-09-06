@@ -1,7 +1,7 @@
 import { readFile, writeFile } from "fs";
 
 import { CELLL, Mem } from "./mem";
-import { prims, primCount } from "./vm";
+import { prims } from "./vm";
 import { labelOffset, upp, Dict } from "./dict";
 
 let dictm: Dict | null = null;
@@ -84,6 +84,11 @@ export function build(cb: (mem: Mem) => void) {
     err,
     data: string
   ) {
+    if (err) {
+      console.log(err);
+      return;
+    }
+
     const lines = data.split("\n");
 
     lines.map(trim).forEach(parse);

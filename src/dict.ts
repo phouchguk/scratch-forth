@@ -1,9 +1,8 @@
-import { CELLL, REG_TOP, Mem } from "./mem";
+import { CELLL, Mem } from "./mem";
 import { topRp, topSp } from "./stack";
 import { primCount } from "./vm";
 
 export const upp = align(primCount);
-const codeStart = 256;
 
 function align(n: number): number {
   const offset = n % CELLL;
