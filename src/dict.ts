@@ -1,6 +1,8 @@
 import { CELLL, REG_TOP, Mem } from "./mem";
+import { topRp, topSp } from "./stack";
+import { primCount } from "./vm";
 
-const upp = REG_TOP;
+export const upp = align(primCount);
 const codeStart = 256;
 
 function align(n: number): number {
@@ -18,17 +20,30 @@ export const labelOffset = 65536;
 export class Dict {
   private mem: Mem;
   private cp: number;
+  private up: number = 0; // _user offset
   private previous: number;
 
-  constructor(start: number, mem: Mem) {
+  constructor(mem: Mem) {
     this.mem = mem;
 
-    if (start < REG_TOP) {
-      start = REG_TOP;
-    }
-
-    this.cp = align(start);
+    // start code after user variable area
+    this.cp = this.prepareVars();
     this.previous = 0;
+  }
+
+  prepareVars(): number {
+    // vars are stored at the start of mem (after primitive count), but refered to from code later
+    let vp = upp;
+
+    // SP0
+    this.mem.set16(vp, topSp);
+    vp += CELLL;
+
+    // RP0
+    this.mem.set16(vp, topRp);
+    vp += CELLL;
+
+    return vp;
   }
 
   lookup(name: string): number {
@@ -97,5 +112,11 @@ export class Dict {
 
       this.cp += CELLL;
     }
+  }
+
+  user(name: string) {
+    console.log("$USER", name);
+    this.colon(name, [this.lookup("doUSER"), this.up]);
+    this.up += CELLL;
   }
 }

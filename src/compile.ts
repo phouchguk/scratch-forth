@@ -2,7 +2,7 @@ import { readFile, writeFile } from "fs";
 
 import { CELLL, Mem } from "./mem";
 import { prims, primCount } from "./vm";
-import { labelOffset, Dict } from "./dict";
+import { labelOffset, upp, Dict } from "./dict";
 
 let dictm: Dict | null = null;
 
@@ -10,7 +10,7 @@ const isNr = /^-?\d+$/;
 
 const vars: { [key: string]: number } = {};
 
-vars["UPP"] = primCount;
+vars["UPP"] = upp;
 
 function compile(x: string) {
   if (isNr.test(x)) {
@@ -41,6 +41,12 @@ function parse(l: string) {
 
   const parts = l.split(" ").map(trim);
   const name = parts[0];
+
+  if (name === "$USER") {
+    (dictm as Dict).user(parts[1]);
+    return;
+  }
+
   const code: string[] = [];
   const insts = parts.slice(1);
   const labels: { [key: string]: number } = {};
@@ -72,7 +78,7 @@ function parse(l: string) {
 
 export function build(cb: (mem: Mem) => void) {
   const mem = new Mem();
-  dictm = new Dict(primCount, mem);
+  dictm = new Dict(mem);
 
   readFile("src/prelude.txt", { encoding: "utf8" }, function (
     err,

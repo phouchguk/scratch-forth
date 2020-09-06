@@ -2,8 +2,8 @@ import { CELLL, EM, Mem } from "./mem";
 
 const stackCells = 32;
 const stackDepth = stackCells * CELLL;
-const topRp = EM;
-const topSp = EM - stackDepth;
+export const topRp = EM;
+export const topSp = EM - stackDepth;
 
 export class Stack {
   private mem: Mem;
