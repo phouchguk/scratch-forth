@@ -17,8 +17,8 @@ function align(n: number): number {
 export const labelOffset = 65536;
 
 export class Dict {
+  cp: number;
   private mem: Mem;
-  private cp: number;
   private up: number = 0; // _user offset
   private previous: number;
 
@@ -34,12 +34,24 @@ export class Dict {
     // vars are stored at the start of mem (after primitive count), but refered to from code later
     let vp = upp;
 
+    // CP
+    this.mem.set16(vp, 0);
+    vp += CELLL;
+
     // SP0
     this.mem.set16(vp, topSp);
     vp += CELLL;
 
     // RP0
     this.mem.set16(vp, topRp);
+    vp += CELLL;
+
+    // #TIB
+    // The terminal input buffer starts at the same point as the data stack,
+    // but TIB goes up, growing into the same space as the return stack.
+    // SP goes down. It is two words, the buffer count, and the address of the buffer.
+    vp += CELLL; // the buffer count
+    this.mem.set16(vp, topSp);
     vp += CELLL;
 
     return vp;

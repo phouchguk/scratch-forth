@@ -67,7 +67,7 @@ TIC		EQU	39			;tick
 
 CALLL		EQU	0E890H			;NOP CALL opcodes
 
-;; Memory allocation	0//code>--//--<name//up>--<sp//tib>--rp//em
+;; Memory allocation	0//code>--//--<name//up>--<sp//tib>--<rp//em
 
 EM		EQU	04000H			;top of memory
 COLDD		EQU	00100H			;cold start vector
@@ -2092,4 +2092,3 @@ MAIN	ENDS
 END	ORIG
 
 ;===============================================================
-

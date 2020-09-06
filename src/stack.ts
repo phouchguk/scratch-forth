@@ -1,6 +1,6 @@
 import { CELLL, EM, Mem } from "./mem";
 
-const stackCells = 32;
+const stackCells = 64;
 const stackDepth = stackCells * CELLL;
 export const topRp = EM;
 export const topSp = EM - stackDepth;
