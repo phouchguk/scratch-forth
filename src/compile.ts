@@ -11,6 +11,7 @@ const isNr = /^-?\d+$/;
 const vars: { [key: string]: number } = {};
 
 vars["UPP"] = upp;
+vars["CELLL"] = CELLL;
 
 function compile(x: string) {
   if (isNr.test(x)) {
