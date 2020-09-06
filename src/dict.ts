@@ -115,7 +115,6 @@ export class Dict {
   }
 
   user(name: string) {
-    console.log("$USER", name);
     this.colon(name, [this.lookup("doUSER"), this.up]);
     this.up += CELLL;
   }
