@@ -6,7 +6,7 @@ const signFlag = 1 << (CELLL * 8 - 1);
 
 export const prims = [
   "BYE",
-  "RX",
+  "KEY",
   "TX!",
   "doLIT",
   "EXIT",
@@ -50,7 +50,10 @@ export class Vm {
 
   step() {
     const op = this.mem.get16(this.mem.PC);
+
     this.mem.PC += CELLL; // point to next instruction
+
+    //console.log(prims[op] ? prims[op] : op);
 
     // primitive
     switch (op) {
@@ -58,7 +61,7 @@ export class Vm {
         this.running = false;
         return;
 
-      case 1: // RX
+      case 1: // KEY
         this.stack.pushd("?".charCodeAt(0)); // should stop vm and wait for input
         return;
 

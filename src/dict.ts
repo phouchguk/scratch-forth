@@ -31,7 +31,7 @@ export class Dict {
   }
 
   prepareVars(): number {
-    // vars are stored at the start of mem (after primitive count), but refered to from code later
+    // vars are stored at the start of mem (after primitive count), but referred to from code later
     let vp = upp;
 
     // CP
@@ -52,6 +52,14 @@ export class Dict {
     // SP goes down. It is two words, the buffer count, and the address of the buffer.
     vp += CELLL; // the buffer count
     this.mem.set16(vp, topSp);
+    vp += CELLL;
+
+    // HLD
+    this.mem.set16(vp, 0);
+    vp += CELLL;
+
+    // BASE
+    this.mem.set16(vp, 10);
     vp += CELLL;
 
     return vp;
@@ -118,7 +126,7 @@ export class Dict {
     for (let i = 0; i < ops.length; i++) {
       this.mem.set16(
         this.cp,
-        ops[i] > labelOffset ? codeStart + ops[i] - labelOffset : ops[i]
+        ops[i] >= labelOffset ? codeStart + ops[i] - labelOffset : ops[i]
       );
 
       this.cp += CELLL;
@@ -126,7 +134,10 @@ export class Dict {
   }
 
   user(name: string) {
-    this.colon(name, [this.lookup("doUSER"), this.up]);
+    if (name) {
+      this.colon(name, [this.lookup("doUSER"), this.up]);
+    }
+
     this.up += CELLL;
   }
 }

@@ -69,7 +69,7 @@ function parse(l: string) {
   for (let i = 0; i < code.length; i++) {
     const inst = code[i];
 
-    if (labels[inst]) {
+    if (typeof labels[inst] !== "undefined") {
       code[i] = labelOffset + labels[inst] + "";
     }
   }
@@ -96,6 +96,7 @@ export function build(cb: (mem: Mem) => void) {
     mem.PC = (dictm as Dict).lookup("START");
     mem.set16(upp, (dictm as Dict).cp); // set final code pointer (first var at upp)
 
+    //dump(mem);
     cb(mem);
   });
 }
