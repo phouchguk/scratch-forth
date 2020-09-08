@@ -18,6 +18,7 @@ export const labelOffset = 65536;
 
 export class Dict {
   cp: number;
+  np: number;
   private mem: Mem;
   private up: number = 0; // _user offset
   private previous: number;
@@ -27,6 +28,7 @@ export class Dict {
 
     // start code after user variable area
     this.cp = this.prepareVars();
+    this.np = 0;
     this.previous = 0;
   }
 
@@ -35,6 +37,10 @@ export class Dict {
     let vp = upp;
 
     // CP
+    this.mem.set16(vp, 0);
+    vp += CELLL;
+
+    // NP
     this.mem.set16(vp, 0);
     vp += CELLL;
 
@@ -60,6 +66,14 @@ export class Dict {
 
     // BASE
     this.mem.set16(vp, 10);
+    vp += CELLL;
+
+    // tmp
+    this.mem.set16(vp, 0);
+    vp += CELLL;
+
+    // >IN
+    this.mem.set16(vp, 0);
     vp += CELLL;
 
     return vp;
@@ -120,6 +134,7 @@ export class Dict {
   colon(name: string, ops: number[]) {
     this.code(name);
 
+    this.np = this.cp;
     const codeStart = this.cp;
 
     // ops
@@ -134,6 +149,7 @@ export class Dict {
   }
 
   user(name: string) {
+    // can add a blank CELL size space by passing blank name
     if (name) {
       this.colon(name, [this.lookup("doUSER"), this.up]);
     }
