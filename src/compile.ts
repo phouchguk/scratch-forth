@@ -12,6 +12,8 @@ const vars: { [key: string]: number } = {};
 
 vars["UPP"] = upp;
 vars["CELLL"] = CELLL;
+vars["CRR"] = 13;
+vars["LF"] = 10;
 
 function compile(x: string) {
   if (isNr.test(x)) {

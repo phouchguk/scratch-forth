@@ -67,7 +67,7 @@ export class Vm {
 
       case 2: // TX!
         const c = this.stack.popd();
-        console.log(c); // needs to presume char
+        console.log(String.fromCharCode(c)); // needs to presume char
         return;
 
       case 3: // doLIT
