@@ -1,21 +1,21 @@
 import { CELLL, EM, Mem } from "./mem";
 
-const stackCells = 64;
-const stackDepth = stackCells * CELLL;
-export const topRp = EM;
-export const topSp = EM - stackDepth;
+const rts = 64 * CELLL;
+export const rpp = EM - 8 * CELLL;
+export const tibb = rpp - rts;
+export const spp = tibb - 8 * CELLL;
 
 export class Stack {
   private mem: Mem;
 
   constructor(mem: Mem) {
     this.mem = mem;
-    this.mem.RP = topRp;
-    this.mem.SP = topSp;
+    this.mem.RP = rpp;
+    this.mem.SP = spp;
   }
 
   popd(): number {
-    if (this.mem.SP === topSp) {
+    if (this.mem.SP === spp) {
       throw new Error("data stack underflow");
     }
 
@@ -26,7 +26,7 @@ export class Stack {
   }
 
   popr(): number {
-    if (this.mem.RP === topRp) {
+    if (this.mem.RP === rpp) {
       throw new Error("return stack underflow");
     }
 
@@ -40,7 +40,8 @@ export class Stack {
     this.mem.SP -= CELLL;
     const i = this.mem.SP;
 
-    if (i - topSp === stackDepth) {
+    if (i - spp === rts) {
+      // data stack prob shouldn't actually be limited
       throw new Error("data stack overflow");
     }
 
@@ -51,7 +52,7 @@ export class Stack {
     this.mem.RP -= CELLL;
     const i = this.mem.RP;
 
-    if (i - topRp === stackDepth) {
+    if (i - rpp === rts) {
       throw new Error("return stack overflow");
     }
 

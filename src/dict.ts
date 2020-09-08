@@ -1,9 +1,13 @@
-import { CELLL, Mem } from "./mem";
-import { topRp, topSp } from "./stack";
-import { primCount } from "./vm";
+import { CELLL, EM, Mem } from "./mem";
+import { rpp, spp, tibb } from "./stack";
 
-export const upp = align(primCount);
+const coldd = 0x100;
+const us = 64 * CELLL;
+export const upp = EM - 256 * CELLL;
+const namee = upp - 8 * CELLL;
+const codee = coldd + us; // think us is a waste of space
 
+/*
 function align(n: number): number {
   const offset = n % CELLL;
 
@@ -13,80 +17,80 @@ function align(n: number): number {
 
   return n + (CELLL - offset);
 }
+*/
 
 export const labelOffset = 65536;
 
 export class Dict {
-  cp: number;
-  np: number;
+  _link: number;
+  _name: number;
+  _code: number;
+  _user: number;
+
   private mem: Mem;
-  private up: number = 0; // _user offset
-  private previous: number;
 
   constructor(mem: Mem) {
     this.mem = mem;
 
-    // start code after user variable area
-    this.cp = this.prepareVars();
-    this.np = 0;
-    this.previous = 0;
+    this._link = 0;
+    this._name = namee;
+    this._code = codee;
+    this._user = 0;
+
+    this.prepareVars();
   }
 
-  prepareVars(): number {
-    // vars are stored at the start of mem (after primitive count), but referred to from code later
-    let vp = upp;
+  prepareVars() {
+    let up = upp;
 
     // CP
-    this.mem.set16(vp, 0);
-    vp += CELLL;
+    this.mem.set16(up, 0);
+    up += CELLL;
 
     // NP
-    this.mem.set16(vp, 0);
-    vp += CELLL;
+    this.mem.set16(up, 0);
+    up += CELLL;
 
     // SP0
-    this.mem.set16(vp, topSp);
-    vp += CELLL;
+    this.mem.set16(up, spp);
+    up += CELLL;
 
     // RP0
-    this.mem.set16(vp, topRp);
-    vp += CELLL;
+    this.mem.set16(up, rpp);
+    up += CELLL;
 
     // #TIB
     // The terminal input buffer starts at the same point as the data stack,
     // but TIB goes up, growing into the same space as the return stack.
     // SP goes down. It is two words, the buffer count, and the address of the buffer.
-    vp += CELLL; // the buffer count
-    this.mem.set16(vp, topSp);
-    vp += CELLL;
+    up += CELLL; // the buffer count
+    this.mem.set16(up, tibb); // the buffer address
+    up += CELLL;
 
     // HLD
-    this.mem.set16(vp, 0);
-    vp += CELLL;
+    this.mem.set16(up, 0);
+    up += CELLL;
 
     // BASE
-    this.mem.set16(vp, 10);
-    vp += CELLL;
+    this.mem.set16(up, 10);
+    up += CELLL;
 
     // tmp
-    this.mem.set16(vp, 0);
-    vp += CELLL;
+    this.mem.set16(up, 0);
+    up += CELLL;
 
     // >IN
-    this.mem.set16(vp, 0);
-    vp += CELLL;
-
-    return vp;
+    this.mem.set16(up, 0);
+    up += CELLL;
   }
 
   lookup(name: string): number {
     const len = name.length;
-    let ptr = this.previous;
+    let ptr = this._link;
 
     while (ptr !== 0) {
-      const prev = this.mem.get16(ptr);
-      ptr += CELLL;
-
+      const start = ptr; // start of name (len + chars)
+      const prev = this.mem.get16(start - CELLL); // previous word is one cell behind
       const dictLen = this.mem.get8(ptr++);
 
       if (dictLen !== len) {
@@ -105,55 +109,59 @@ export class Dict {
         continue;
       }
 
-      return align(ptr); // return code start
+      return this.mem.get16(start - CELLL * 2); // code ptr is two cells behind start
     }
 
     throw new Error(`${name}?`);
   }
 
   code(name: string) {
-    const len = name.length;
+    const lex = name.length;
+    const len = Math.floor(lex / CELLL);
+    this._name = this._name - (len + 3) * CELLL;
+
+    let ptr = this._name;
 
     // addr of previous entry
-    this.mem.set16(this.cp, this.previous);
-    this.previous = this.cp;
-    this.cp += CELLL;
+    this.mem.set16(ptr, this._code); // pointer to code
+    ptr += CELLL;
 
-    // name len
-    this.mem.set8(this.cp++, len);
+    this.mem.set16(ptr, this._link); // link to previous
+    ptr += CELLL;
+
+    this._link = ptr; // link points to name string
+
+    // name len (lex)
+    this.mem.set8(ptr++, lex);
 
     // name chars
-    for (let i = 0; i < len; i++) {
-      this.mem.set8(this.cp++, name.charCodeAt(i));
+    for (let i = 0; i < lex; i++) {
+      this.mem.set8(ptr++, name.charCodeAt(i));
     }
-
-    // align
-    this.cp = align(this.cp);
   }
 
   colon(name: string, ops: number[]) {
     this.code(name);
 
-    this.np = this.cp;
-    const codeStart = this.cp;
+    const codeStart = this._code;
 
     // ops
     for (let i = 0; i < ops.length; i++) {
       this.mem.set16(
-        this.cp,
+        this._code,
         ops[i] >= labelOffset ? codeStart + ops[i] - labelOffset : ops[i]
       );
 
-      this.cp += CELLL;
+      this._code += CELLL;
     }
   }
 
   user(name: string) {
     // can add a blank CELL size space by passing blank name
     if (name) {
-      this.colon(name, [this.lookup("doUSER"), this.up]);
+      this.colon(name, [this.lookup("doUSER"), this._user]);
     }
 
-    this.up += CELLL;
+    this._user += CELLL;
   }
 }

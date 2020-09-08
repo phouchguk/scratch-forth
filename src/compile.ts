@@ -96,7 +96,6 @@ export function build(cb: (mem: Mem) => void) {
 
     lines.map(trim).forEach(parse);
     mem.PC = (dictm as Dict).lookup("START");
-    mem.set16(upp, (dictm as Dict).cp); // set final code pointer (first var at upp)
 
     //dump(mem);
     cb(mem);
