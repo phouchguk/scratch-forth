@@ -1,2 +1,2 @@
 tsc
-#browserify dist/forth.js > dist/browser.js
+browserify dist/browser.js > dist/web.js

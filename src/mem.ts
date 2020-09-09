@@ -13,8 +13,8 @@ export class Mem {
   readonly rpi = 3; // return stack pointer
   readonly wpi = 4; // work pointer
 
-  constructor() {
-    this.mem = new ArrayBuffer(EM);
+  constructor(mem: ArrayBuffer) {
+    this.mem = mem;
     this.m8 = new Uint8Array(this.mem);
     this.m16 = new Uint16Array(this.mem);
   }

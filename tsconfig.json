@@ -1,13 +1,15 @@
 {
-    "compilerOptions": {
-        "strict": true,
-        "noUnusedLocals": true,
-        "noUnusedParameters": true,
-        "removeComments": true,
-        "target": "es5",
-        "outDir": "./dist"
-    },
-    "files": [
-        "./src/forth.ts"
-    ]
+  "compilerOptions": {
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "removeComments": true,
+    "target": "es5",
+    "outDir": "./dist"
+  },
+  "files": [
+    "./src/browser.ts",
+    "./src/compile.ts",
+    "./src/forth.ts",
+  ]
 }

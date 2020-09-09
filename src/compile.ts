@@ -1,6 +1,6 @@
 import { readFile, writeFile } from "fs";
 
-import { CELLL, Mem } from "./mem";
+import { CELLL, EM, Mem } from "./mem";
 import { prims } from "./vm";
 import { labelOffset, upp, Dict } from "./dict";
 
@@ -79,8 +79,9 @@ function parse(l: string) {
   (dictm as Dict).colon(name, code.map(compile));
 }
 
-export function build(cb: (mem: Mem) => void) {
-  const mem = new Mem();
+// cb: (mem: Mem) => void
+export function build() {
+  const mem = new Mem(new ArrayBuffer(EM));
   dictm = new Dict(mem);
 
   readFile("src/prelude.txt", { encoding: "utf8" }, function (
@@ -97,16 +98,17 @@ export function build(cb: (mem: Mem) => void) {
     lines.map(trim).forEach(parse);
     mem.PC = (dictm as Dict).lookup("START");
 
-    //dump(mem);
-    cb(mem);
+    dump(mem);
   });
 }
 
 export function dump(mem: Mem) {
-  writeFile("mem.bin", mem.m8, { encoding: "ascii" }, function (err) {
+  writeFile("dist/mem.bin", mem.m8, { encoding: "ascii" }, function (err) {
     if (err) {
       console.log(err);
       return;
     }
   });
 }
+
+build();
