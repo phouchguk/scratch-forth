@@ -1,8 +1,39 @@
 import { readFile, writeFile } from "fs";
 
 import { CELLL, EM, Mem } from "./mem";
-import { prims } from "./vm";
 import { labelOffset, upp, Dict } from "./dict";
+
+const prims = [
+  "BYE",
+  "KEY",
+  "TX!",
+  "doLIT",
+  "EXIT",
+  "EXECUTE",
+  "next",
+  "?branch",
+  "branch",
+  "!",
+  "@",
+  "C!",
+  "C@",
+  "RP@",
+  "RP!",
+  "R>",
+  "R@",
+  ">R",
+  "SP@",
+  "SP!",
+  "DROP",
+  "DUP",
+  "SWAP",
+  "OVER",
+  "0<",
+  "AND",
+  "OR",
+  "XOR",
+  "UM+",
+];
 
 let dictm: Dict | null = null;
 

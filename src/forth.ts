@@ -1,6 +1,7 @@
 import { open, read } from "fs";
 import { EM, Mem } from "./mem";
 import { Vm } from "./vm";
+import { Console } from "./console";
 
 open("dist/mem.bin", "r", function (err, fd) {
   if (err) {
@@ -19,7 +20,9 @@ open("dist/mem.bin", "r", function (err, fd) {
 
     const mem = new Mem(buffer);
 
-    const vm = new Vm(mem);
+    const io = new Console();
+
+    const vm = new Vm(mem, io);
     vm.run();
   });
 });

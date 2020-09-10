@@ -1,2 +1,2 @@
-tsc
-browserify dist/browser.js > dist/web.js
+tsc && browserify dist/browser.js > dist/web.js
+# && node dist/compile

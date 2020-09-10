@@ -1,50 +1,20 @@
 import { CELLL, Mem } from "./mem";
+import { Io } from "./io";
 import { Stack } from "./stack";
 
 const minus1 = Math.pow(2, CELLL * 8) - 1;
 const signFlag = 1 << (CELLL * 8 - 1);
 
-export const prims = [
-  "BYE",
-  "KEY",
-  "TX!",
-  "doLIT",
-  "EXIT",
-  "EXECUTE",
-  "next",
-  "?branch",
-  "branch",
-  "!",
-  "@",
-  "C!",
-  "C@",
-  "RP@",
-  "RP!",
-  "R>",
-  "R@",
-  ">R",
-  "SP@",
-  "SP!",
-  "DROP",
-  "DUP",
-  "SWAP",
-  "OVER",
-  "0<",
-  "AND",
-  "OR",
-  "XOR",
-  "UM+",
-];
-
-export const primCount = prims.length;
-
 export class Vm {
   private mem: Mem;
+  private io: Io;
   private stack: Stack;
   private running: boolean = false;
 
-  constructor(mem: Mem) {
+  constructor(mem: Mem, io: Io) {
     this.mem = mem;
+    this.io = io;
+
     this.stack = new Stack(this.mem);
   }
 
@@ -62,12 +32,13 @@ export class Vm {
         return;
 
       case 1: // KEY
-        this.stack.pushd("?".charCodeAt(0)); // should stop vm and wait for input
+        this.running = false;
+        this.io.key(this);
         return;
 
       case 2: // TX!
         const c = this.stack.popd();
-        console.log(String.fromCharCode(c)); // needs to presume char
+        this.io.txsto(c);
         return;
 
       case 3: // doLIT
@@ -226,5 +197,9 @@ export class Vm {
     while (this.running) {
       this.step();
     }
+  }
+
+  pushd(c: number) {
+    this.stack.pushd(c);
   }
 }
