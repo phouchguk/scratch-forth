@@ -91,6 +91,11 @@ export class Dict {
     up += CELLL;
     up += CELLL * vocss;
 
+    // CURRENT
+    this.mem.set16(up, 0);
+    up += CELLL;
+    up += CELLL;
+
     // SPAN
     this.mem.set16(up, 0);
     up += CELLL;

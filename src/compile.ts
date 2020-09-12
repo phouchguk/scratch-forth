@@ -20,6 +20,7 @@ vars["BKSPP"] = 8;
 vars["BYTE"] = byteModeSwitch;
 vars["COMPO"] = 0x40;
 vars["TIBB"] = tibb;
+vars["ERR"] = 27;
 
 function compile(x: string) {
   if (isNr.test(x)) {
