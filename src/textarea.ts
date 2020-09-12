@@ -11,9 +11,24 @@ export class TextArea implements Io {
     const self = this;
     this.el = document.getElementById("output") as HTMLTextAreaElement;
 
+    this.el.addEventListener("keydown", function (e) {
+      e.preventDefault();
+    });
+
     this.el.addEventListener("keypress", function (e) {
       e.preventDefault();
-      self.buffer.push(e.charCode);
+    });
+
+    this.el.addEventListener("keyup", function (e) {
+      e.preventDefault();
+
+      if (e.keyCode === 8 || e.keyCode === 13) {
+        self.buffer.push(e.keyCode);
+      } else if (e.key.length === 1) {
+        self.buffer.push(e.key.charCodeAt(0));
+      } else {
+        return;
+      }
 
       if (self.waiting) {
         self.waiting = false;
@@ -37,6 +52,13 @@ export class TextArea implements Io {
 
   txsto(c: number): void {
     console.log(c);
+
+    if (c === 8) {
+      // backspace
+      this.el.value = this.el.value.substring(0, this.el.value.length - 1);
+      return;
+    }
+
     this.el.value += String.fromCharCode(c);
   }
 
