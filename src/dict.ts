@@ -97,6 +97,14 @@ export class Dict {
     // HANDLER
     this.mem.set16(up, 0);
     up += CELLL;
+
+    // 'EVAL
+    this.mem.set16(up, 0);
+    up += CELLL;
+
+    // 'PROMPT
+    this.mem.set16(up, 0);
+    up += CELLL;
   }
 
   lookup(name: string): number {
