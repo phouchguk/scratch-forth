@@ -8,7 +8,6 @@ const namee = upp - 8 * CELLL;
 const codee = coldd + us; // think us is a waste of space
 const vocss = 8;
 
-/*
 function align(n: number): number {
   const offset = n % CELLL;
 
@@ -18,9 +17,9 @@ function align(n: number): number {
 
   return n + (CELLL - offset);
 }
-*/
 
 export const labelOffset = 65536;
+export const byteModeSwitch = 70000;
 
 export class Dict {
   _link: number;
@@ -29,6 +28,7 @@ export class Dict {
   _user: number;
 
   private mem: Mem;
+  private byteMode: boolean = false;
 
   constructor(mem: Mem) {
     this.mem = mem;
@@ -91,6 +91,10 @@ export class Dict {
     up += CELLL * vocss;
 
     // SPAN
+    this.mem.set16(up, 0);
+    up += CELLL;
+
+    // HANDLER
     this.mem.set16(up, 0);
     up += CELLL;
   }
@@ -158,12 +162,23 @@ export class Dict {
 
     // ops
     for (let i = 0; i < ops.length; i++) {
-      this.mem.set16(
-        this._code,
-        ops[i] >= labelOffset ? codeStart + ops[i] - labelOffset : ops[i]
-      );
+      if (ops[i] === byteModeSwitch) {
+        this._code = align(this._code);
+        this.byteMode = !this.byteMode;
+        continue;
+      }
 
-      this._code += CELLL;
+      if (this.byteMode) {
+        this.mem.set8(this._code, ops[i]);
+        this._code++;
+      } else {
+        this.mem.set16(
+          this._code,
+          ops[i] >= labelOffset ? codeStart + ops[i] - labelOffset : ops[i]
+        );
+
+        this._code += CELLL;
+      }
     }
   }
 

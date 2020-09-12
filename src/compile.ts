@@ -1,7 +1,7 @@
 import { readFile, writeFile } from "fs";
 
 import { CELLL, EM, Mem } from "./mem";
-import { labelOffset, upp, Dict } from "./dict";
+import { byteModeSwitch, labelOffset, upp, Dict } from "./dict";
 import { prims } from "./vm";
 
 let dictm: Dict | null = null;
@@ -16,6 +16,7 @@ vars["CRR"] = 13;
 vars["LF"] = 10;
 vars["MASKK"] = 0x7f1f;
 vars["BKSPP"] = 8;
+vars["BYTE"] = byteModeSwitch;
 
 function compile(x: string) {
   if (isNr.test(x)) {
