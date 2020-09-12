@@ -88,6 +88,7 @@ export class Dict {
 
     // CONTEXT
     this.mem.set16(up, 0);
+    up += CELLL;
     up += CELLL * vocss;
 
     // SPAN
@@ -99,6 +100,26 @@ export class Dict {
     up += CELLL;
 
     // 'EVAL
+    this.mem.set16(up, 0);
+    up += CELLL;
+
+    // 'NUMBER
+    this.mem.set16(up, 0);
+    up += CELLL;
+
+    // 'EMIT
+    this.mem.set16(up, 0);
+    up += CELLL;
+
+    // 'EXPECT
+    this.mem.set16(up, 0);
+    up += CELLL;
+
+    // 'TAP
+    this.mem.set16(up, 0);
+    up += CELLL;
+
+    // 'ECHO
     this.mem.set16(up, 0);
     up += CELLL;
 

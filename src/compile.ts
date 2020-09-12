@@ -3,6 +3,7 @@ import { readFile, writeFile } from "fs";
 import { CELLL, EM, Mem } from "./mem";
 import { byteModeSwitch, labelOffset, upp, Dict } from "./dict";
 import { prims } from "./vm";
+import { tibb } from "./stack";
 
 let dictm: Dict | null = null;
 
@@ -18,6 +19,7 @@ vars["MASKK"] = 0x7f1f;
 vars["BKSPP"] = 8;
 vars["BYTE"] = byteModeSwitch;
 vars["COMPO"] = 0x40;
+vars["TIBB"] = tibb;
 
 function compile(x: string) {
   if (isNr.test(x)) {
