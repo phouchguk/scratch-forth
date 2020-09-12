@@ -2,38 +2,7 @@ import { readFile, writeFile } from "fs";
 
 import { CELLL, EM, Mem } from "./mem";
 import { labelOffset, upp, Dict } from "./dict";
-
-const prims = [
-  "BYE",
-  "KEY",
-  "TX!",
-  "doLIT",
-  "EXIT",
-  "EXECUTE",
-  "next",
-  "?branch",
-  "branch",
-  "!",
-  "@",
-  "C!",
-  "C@",
-  "RP@",
-  "RP!",
-  "R>",
-  "R@",
-  ">R",
-  "SP@",
-  "SP!",
-  "DROP",
-  "DUP",
-  "SWAP",
-  "OVER",
-  "0<",
-  "AND",
-  "OR",
-  "XOR",
-  "UM+",
-];
+import { prims } from "./vm";
 
 let dictm: Dict | null = null;
 
@@ -45,6 +14,8 @@ vars["UPP"] = upp;
 vars["CELLL"] = CELLL;
 vars["CRR"] = 13;
 vars["LF"] = 10;
+vars["MASKK"] = 0x7f1f;
+vars["BKSPP"] = 8;
 
 function compile(x: string) {
   if (isNr.test(x)) {

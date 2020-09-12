@@ -5,6 +5,38 @@ import { Stack } from "./stack";
 const minus1 = Math.pow(2, CELLL * 8) - 1;
 const signFlag = 1 << (CELLL * 8 - 1);
 
+export const prims = [
+  "BYE",
+  "KEY",
+  "TX!",
+  "doLIT",
+  "EXIT",
+  "EXECUTE",
+  "next",
+  "?branch",
+  "branch",
+  "!",
+  "@",
+  "C!",
+  "C@",
+  "RP@",
+  "RP!",
+  "R>",
+  "R@",
+  ">R",
+  "SP@",
+  "SP!",
+  "DROP",
+  "DUP",
+  "SWAP",
+  "OVER",
+  "0<",
+  "AND",
+  "OR",
+  "XOR",
+  "UM+",
+];
+
 export class Vm {
   private mem: Mem;
   private io: Io;

@@ -65,7 +65,7 @@ export class Mem {
 
   get16(addr: number) {
     if (addr % CELLL !== 0) {
-      throw new Error(`bad addr 16: ${addr}`);
+      throw new Error(`bad get addr 16: ${addr}`);
     }
 
     return this.m16[addr / 2];
@@ -77,7 +77,7 @@ export class Mem {
 
   set16(addr: number, value: number) {
     if (addr % CELLL !== 0) {
-      throw new Error(`bad addr 16: ${addr}`);
+      throw new Error(`bad set addr 16: ${addr}`);
     }
 
     this.m16[addr / 2] = value;

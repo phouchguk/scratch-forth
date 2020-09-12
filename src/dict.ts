@@ -6,6 +6,7 @@ const us = 64 * CELLL;
 export const upp = EM - 256 * CELLL;
 const namee = upp - 8 * CELLL;
 const codee = coldd + us; // think us is a waste of space
+const vocss = 8;
 
 /*
 function align(n: number): number {
@@ -64,6 +65,8 @@ export class Dict {
     // but TIB goes up, growing into the same space as the return stack.
     // SP goes down. It is two words, the buffer count, and the address of the buffer.
     up += CELLL; // the buffer count
+
+    // TIB
     this.mem.set16(up, tibb); // the buffer address
     up += CELLL;
 
@@ -80,6 +83,14 @@ export class Dict {
     up += CELLL;
 
     // >IN
+    this.mem.set16(up, 0);
+    up += CELLL;
+
+    // CONTEXT
+    this.mem.set16(up, 0);
+    up += CELLL * vocss;
+
+    // SPAN
     this.mem.set16(up, 0);
     up += CELLL;
   }
