@@ -12,7 +12,9 @@ export class TextArea implements Io {
     this.el = document.getElementById("output") as HTMLTextAreaElement;
 
     this.el.addEventListener("keydown", function (e) {
-      e.preventDefault();
+      if (e.keyCode === 8) {
+        e.preventDefault();
+      }
     });
 
     this.el.addEventListener("keypress", function (e) {
