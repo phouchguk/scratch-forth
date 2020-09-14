@@ -53,8 +53,6 @@ export class TextArea implements Io {
   }
 
   txsto(c: number): void {
-    console.log(c);
-
     if (c === 8) {
       // backspace
       this.el.value = this.el.value.substring(0, this.el.value.length - 1);

@@ -179,6 +179,7 @@ export class Dict {
     ptr += CELLL;
 
     this._link = ptr; // link points to name string
+    console.log(name, this._link);
 
     // name len (lex)
     this.mem.set8(ptr++, lex);
