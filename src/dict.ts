@@ -29,6 +29,7 @@ export class Dict {
 
   private mem: Mem;
   private byteMode: boolean = false;
+  private lastAddr: number = 0;
 
   constructor(mem: Mem) {
     this.mem = mem;
@@ -131,6 +132,11 @@ export class Dict {
     // 'PROMPT
     this.mem.set16(up, 0);
     up += CELLL;
+
+    // LAST
+    this.lastAddr = up;
+    this.mem.set16(up, 0);
+    up += CELLL;
   }
 
   lookup(name: string): number {
@@ -179,6 +185,7 @@ export class Dict {
     ptr += CELLL;
 
     this._link = ptr; // link points to name string
+    this.mem.set16(this.lastAddr, this._link);
     console.log(name, this._link);
 
     // name len (lex)
