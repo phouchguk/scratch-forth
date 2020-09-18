@@ -8,7 +8,7 @@ const namee = upp - 8 * CELLL;
 const codee = coldd + us; // think us is a waste of space
 const vocss = 8;
 
-function align(n: number): number {
+export function align(n: number): number {
   const offset = n % CELLL;
 
   if (offset === 0) {

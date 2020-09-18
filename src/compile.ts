@@ -1,7 +1,7 @@
 import { readFile, writeFile } from "fs";
 
 import { CELLL, EM, Mem } from "./mem";
-import { byteModeSwitch, labelOffset, upp, Dict } from "./dict";
+import { align, byteModeSwitch, labelOffset, upp, Dict } from "./dict";
 import { prims } from "./vm";
 import { tibb } from "./stack";
 
@@ -62,14 +62,29 @@ function parse(l: string) {
   const labels: { [key: string]: number } = {};
 
   // extract labels
+  let codeLen = 0;
+  let byteMode = false;
+
   for (let i = 0; i < insts.length; i++) {
     const inst = insts[i];
     if (inst.endsWith(":")) {
       // inst is a label
-      labels[inst.substring(0, inst.length - 1)] = code.length * CELLL;
+      labels[inst.substring(0, inst.length - 1)] = codeLen;
 
       // don't keep label
       continue;
+    }
+
+    if (inst === "BYTE") {
+      if (byteMode) {
+        // leaving byte mode, align
+        codeLen = align(codeLen);
+      }
+
+      byteMode = !byteMode;
+    } else {
+      // 'BYTE' inst doesn't count as actual code
+      codeLen += byteMode ? 1 : CELLL;
     }
 
     code.push(insts[i]);
