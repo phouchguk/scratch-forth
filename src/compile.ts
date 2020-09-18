@@ -19,6 +19,7 @@ vars["MASKK"] = 0x7f1f;
 vars["BKSPP"] = 8;
 vars["BYTE"] = byteModeSwitch;
 vars["COMPO"] = 0x40;
+vars["IMEDD"] = 0x80;
 vars["TIBB"] = tibb;
 vars["ERR"] = 27;
 
