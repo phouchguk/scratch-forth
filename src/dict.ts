@@ -186,7 +186,6 @@ export class Dict {
 
     this._link = ptr; // link points to name string
     this.mem.set16(this.lastAddr, this._link);
-    console.log(name, this._link);
 
     // name len (lex)
     this.mem.set8(ptr++, lex);
@@ -195,6 +194,8 @@ export class Dict {
     for (let i = 0; i < lex; i++) {
       this.mem.set8(ptr++, name.charCodeAt(i));
     }
+
+    console.log(name, this._link, this._code);
   }
 
   colon(name: string, ops: number[]) {

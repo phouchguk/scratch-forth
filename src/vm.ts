@@ -85,6 +85,7 @@ export class Vm {
       case 5: // EXECUTE
         this.stack.pushr(this.mem.PC);
         this.mem.PC = this.stack.popd();
+        console.log("EXECUTE", this.mem.PC);
         return;
 
       case 6: // next
