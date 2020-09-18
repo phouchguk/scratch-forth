@@ -30,6 +30,8 @@ export class Dict {
   private mem: Mem;
   private byteMode: boolean = false;
   private lastAddr: number = 0;
+  private npAddr: number = 0;
+  private cpAddr: number = 0;
 
   constructor(mem: Mem) {
     this.mem = mem;
@@ -46,10 +48,12 @@ export class Dict {
     let up = upp;
 
     // CP
+    this.cpAddr = up;
     this.mem.set16(up, 0);
     up += CELLL;
 
     // NP
+    this.npAddr = up;
     this.mem.set16(up, 0);
     up += CELLL;
 
@@ -195,6 +199,7 @@ export class Dict {
       this.mem.set8(ptr++, name.charCodeAt(i));
     }
 
+    this.mem.set16(this.npAddr, this._name);
     console.log(name, this._link, this._code);
   }
 
@@ -223,6 +228,8 @@ export class Dict {
         this._code += CELLL;
       }
     }
+
+    this.mem.set16(this.cpAddr, this._code);
   }
 
   user(name: string) {
