@@ -11,6 +11,5 @@
     "./src/browser.ts",
     "./src/compile.ts",
     "./src/forth.ts",
-    "./src/test.ts",
   ]
 }

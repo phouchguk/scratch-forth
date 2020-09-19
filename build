@@ -1,2 +1,3 @@
+tsc test/*.ts --target es5 --strict
 tsc && browserify dist/browser.js > dist/web.js
 # && node dist/compile
