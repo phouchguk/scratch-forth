@@ -1,5 +1,6 @@
 import { CELLL, Mem } from "./mem";
 import { Io } from "./io";
+import { IVm } from "./ivm";
 import { Stack } from "./stack";
 
 const minus1 = Math.pow(2, CELLL * 8) - 1;
@@ -37,7 +38,7 @@ export const prims = [
   "UM+",
 ];
 
-export class Vm {
+export class Vm implements IVm {
   private mem: Mem;
   private io: Io;
   private stack: Stack;
