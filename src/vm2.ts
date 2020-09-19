@@ -2,7 +2,7 @@ import { CELLL, Mem } from "./mem";
 import { Io } from "./io";
 import { IVm } from "./ivm";
 
-export enum Reg {
+export const enum Reg {
   PC = 0,
   IP = 2,
   SP = 4,
@@ -11,7 +11,7 @@ export enum Reg {
   FLAGS = 10,
 }
 
-export enum Op {
+export const enum Op {
   ADC,
   ADD,
   CALL,
@@ -30,36 +30,54 @@ export class Vm implements IVm {
     this.io = io;
   }
 
+  stepbx(op: Op) {
+    const b = this.mem.get8(this.mem.PC++);
+
+    const x = this.mem.get16(this.mem.PC);
+    this.mem.PC += CELLL;
+
+    switch (op) {
+      case Op.ADC:
+        this.mem.set16(b, this.mem.get16(b) + x);
+        return;
+
+      case Op.ADD:
+        this.mem.set16(b, this.mem.get16(b) + this.mem.get16(x));
+        return;
+
+      case Op.LD8:
+        this.mem.set8(b, this.mem.get16(x));
+        return;
+
+      case Op.LDA:
+        this.mem.set16(b, this.mem.get16(x));
+        return;
+
+      case Op.LDC:
+        this.mem.set16(b, x);
+        return;
+
+      case Op.LDI:
+        this.mem.set16(b, this.mem.get16(this.mem.get16(x)));
+        return;
+    }
+  }
+
   step() {
     const op = this.mem.get8(this.mem.PC++);
 
     // primitive
     switch (op) {
-      case Op.ADC: {
-        // ADC B C
-        const b = this.mem.get8(this.mem.PC++);
-
-        const c = this.mem.get16(this.mem.PC);
-        this.mem.PC += CELLL;
-
-        this.mem.set16(b, this.mem.get16(b) + c);
-
+      case Op.ADC:
+      case Op.ADD:
+      case Op.LD8:
+      case Op.LDA:
+      case Op.LDC:
+      case Op.LDI:
+        this.stepbx(op as Op);
         return;
-      }
 
-      case 1: {
-        // ADD B A
-        const b = this.mem.get8(this.mem.PC++);
-
-        const a = this.mem.get16(this.mem.PC);
-        this.mem.PC += CELLL;
-
-        this.mem.set16(b, this.mem.get16(b) + this.mem.get16(a));
-
-        return;
-      }
-
-      case 2: {
+      case Op.CALL: {
         // CALL A
         const a = this.mem.get16(++this.mem.PC);
         this.mem.PC += CELLL;
@@ -67,54 +85,6 @@ export class Vm implements IVm {
         const ds = this.mem.get16(Reg.SP) - CELLL;
         this.mem.set16(Reg.SP, ds);
         this.mem.set16(ds, a);
-
-        return;
-      }
-
-      case 3: {
-        // LD8
-        const b = this.mem.get8(this.mem.PC++);
-
-        const a = this.mem.get16(this.mem.PC);
-        this.mem.PC += CELLL;
-
-        this.mem.set8(b, this.mem.get16(a));
-
-        return;
-      }
-
-      case 4: {
-        // LDA
-        const b = this.mem.get8(this.mem.PC++);
-
-        const a = this.mem.get16(this.mem.PC);
-        this.mem.PC += CELLL;
-
-        this.mem.set16(b, this.mem.get16(a));
-
-        return;
-      }
-
-      case 5: {
-        // LDC
-        const b = this.mem.get8(this.mem.PC++);
-
-        const a = this.mem.get16(this.mem.PC);
-        this.mem.PC += CELLL;
-
-        this.mem.set16(b, a);
-
-        return;
-      }
-
-      case 6: {
-        // LDI
-        const b = this.mem.get8(this.mem.PC++);
-
-        const a = this.mem.get16(this.mem.PC);
-        this.mem.PC += CELLL;
-
-        this.mem.set16(b, this.mem.get16(this.mem.get16(a)));
 
         return;
       }
@@ -128,7 +98,7 @@ export class Vm implements IVm {
   }
 
   run() {
-    while (this.mem.get16(0)) {
+    while (this.mem.get16(Reg.PC)) {
       this.step();
     }
   }

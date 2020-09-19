@@ -22,6 +22,10 @@ export class Assembler {
     this.ba(b, a, Op.LDA);
   }
 
+  ldc(b: number, c: number) {
+    this.ba(b, c, Op.LDC);
+  }
+
   ldi(b: number, a: number) {
     this.ba(b, a, Op.LDI);
   }
