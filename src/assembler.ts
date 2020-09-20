@@ -26,6 +26,10 @@ export class Assembler {
     this.ba(b, a, Op.ADD);
   }
 
+  call(a: number) {
+    this.ba(0, a, Op.CALL);
+  }
+
   ld8(b: number, a: number) {
     this.ba(b, a, Op.LD8);
   }
@@ -40,5 +44,9 @@ export class Assembler {
 
   ldi(b: number, a: number) {
     this.ba(b, a, Op.LDI);
+  }
+
+  sbc(b: number, a: number) {
+    this.ba(b, a, Op.SBC);
   }
 }

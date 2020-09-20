@@ -19,6 +19,7 @@ export const enum Op {
   LDA,
   LDC,
   LDI,
+  SBC,
 }
 
 export class Vm implements IVm {
@@ -66,6 +67,13 @@ export class Vm implements IVm {
       case Op.LDI:
         this.mem.set16(b, this.mem.get16(this.mem.get16(x)));
         return;
+
+      case Op.SBC: {
+        const result = this.mem.get16(b) - x;
+        this.mem.set16(b, result);
+        this.mem.set16(Reg.FLAGS, 0);
+        return;
+      }
     }
   }
 
@@ -80,6 +88,7 @@ export class Vm implements IVm {
       case Op.LDA:
       case Op.LDC:
       case Op.LDI:
+      case Op.SBC:
         this.stepbx(op as Op);
         return;
 
@@ -90,7 +99,9 @@ export class Vm implements IVm {
 
         const ds = this.mem.get16(Reg.SP) - CELLL;
         this.mem.set16(Reg.SP, ds);
-        this.mem.set16(ds, a);
+        this.mem.set16(ds, this.mem.PC);
+
+        this.mem.PC = a;
 
         return;
       }

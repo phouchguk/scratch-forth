@@ -1,7 +1,7 @@
 import { strict as assert } from "assert";
 import { Reg, Vm } from "../src/vm2";
 import { Console } from "../src/console";
-import { EM, Mem } from "../src/mem";
+import { CELLL, EM, Mem } from "../src/mem";
 import { Assembler } from "../src/assembler";
 
 describe("Vm", function () {
@@ -77,6 +77,21 @@ describe("Vm", function () {
     });
   });
 
+  describe("#call", function () {
+    it("should push the address after this instruction to the data stack and jump to its address", function () {
+      const sTop = 50;
+      mem.SP = sTop;
+
+      const addr = asm.ap;
+      asm.call(1000);
+      vm.step();
+
+      assert.equal(mem.PC, 1000);
+      assert.equal(mem.SP, sTop - CELLL);
+      assert.equal(mem.get16(mem.SP), addr + CELLL + CELLL);
+    });
+  });
+
   describe("#ld8", function () {
     it("should set its byte address to the byte value at its address", function () {
       mem.SP = 0;
@@ -134,6 +149,42 @@ describe("Vm", function () {
       assert.equal(mem.SP, value);
       assert.equal(mem.WP, addr);
       assert.equal(mem.get16(addr), value);
+    });
+  });
+
+  describe("#sbc", function () {
+    it("should sub its argument from its byte address, ignores overflow flag", function () {
+      mem.WP = 42;
+
+      asm.sbc(Reg.WP, 1);
+      vm.step();
+
+      assert.equal(mem.WP, 41);
+      assert.equal(mem.FLAGS, 0);
+
+      mem.WP = 0;
+
+      asm.sbc(Reg.WP, 1);
+      vm.step();
+
+      assert.equal(mem.WP, 65535);
+      assert.equal(mem.FLAGS, 0);
+
+      mem.WP = 0;
+
+      asm.sbc(Reg.WP, 2);
+      vm.step();
+
+      assert.equal(mem.WP, 65534);
+      assert.equal(mem.FLAGS, 0);
+
+      mem.WP = 42;
+
+      asm.sbc(Reg.WP, 1);
+      vm.step();
+
+      assert.equal(mem.WP, 41);
+      assert.equal(mem.FLAGS, 0);
     });
   });
 });
