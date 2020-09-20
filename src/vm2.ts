@@ -20,6 +20,7 @@ export const enum Op {
   LDC,
   LDI,
   SBC,
+  STI,
 }
 
 export class Vm implements IVm {
@@ -74,6 +75,10 @@ export class Vm implements IVm {
         this.mem.set16(Reg.FLAGS, 0);
         return;
       }
+
+      case Op.STI:
+        this.mem.set16(this.mem.get16(x), this.mem.get16(b));
+        return;
     }
   }
 
@@ -89,6 +94,7 @@ export class Vm implements IVm {
       case Op.LDC:
       case Op.LDI:
       case Op.SBC:
+      case Op.STI:
         this.stepbx(op as Op);
         return;
 

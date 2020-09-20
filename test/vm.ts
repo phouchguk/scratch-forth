@@ -187,4 +187,22 @@ describe("Vm", function () {
       assert.equal(mem.FLAGS, 0);
     });
   });
+
+  describe("#sti", function () {
+    it("should set the address pointed to by its address field to the value in its byte address", function () {
+      const addr = 42;
+      const value = 100;
+
+      mem.SP = value;
+      mem.WP = addr;
+      mem.set16(addr, 99);
+
+      asm.sti(Reg.SP, Reg.WP);
+      vm.step();
+
+      assert.equal(mem.SP, value);
+      assert.equal(mem.WP, addr);
+      assert.equal(mem.get16(addr), value);
+    });
+  });
 });

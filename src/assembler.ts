@@ -49,4 +49,8 @@ export class Assembler {
   sbc(b: number, a: number) {
     this.ba(b, a, Op.SBC);
   }
+
+  sti(b: number, a: number) {
+    this.ba(b, a, Op.STI);
+  }
 }
