@@ -51,6 +51,12 @@ export class Vm implements IVm {
     this.mem.set16(Reg.FLAGS, f);
   }
 
+  push(x: number) {
+    const ds = this.mem.get16(Reg.SP) - CELLL;
+    this.mem.set16(Reg.SP, ds);
+    this.mem.set16(ds, x);
+  }
+
   stepbx(op: Op) {
     const b = this.mem.get8(this.mem.PC++);
 
@@ -78,6 +84,29 @@ export class Vm implements IVm {
         const result = this.mem.get16(b) & this.mem.get16(x);
         this.mem.set16(b, result);
         this.flags(result);
+
+        return;
+      }
+
+      case Op.CALL: {
+        this.push(this.mem.PC);
+        this.mem.PC = x;
+
+        return;
+      }
+
+      case Op.JC: {
+        if (this.mem.FLAGS & 1) {
+          this.mem.PC = x;
+        }
+
+        return;
+      }
+
+      case Op.JZ: {
+        if (this.mem.FLAGS & 2) {
+          this.mem.PC = x;
+        }
 
         return;
       }
@@ -136,6 +165,9 @@ export class Vm implements IVm {
       case Op.ADC:
       case Op.ADD:
       case Op.AND:
+      case Op.CALL:
+      case Op.JC:
+      case Op.JZ:
       case Op.LD8:
       case Op.LDA:
       case Op.LDC:
@@ -146,20 +178,6 @@ export class Vm implements IVm {
       case Op.XOR:
         this.stepbx(op as Op);
         return;
-
-      case Op.CALL: {
-        // CALL A
-        const a = this.mem.get16(++this.mem.PC);
-        this.mem.PC += CELLL;
-
-        const ds = this.mem.get16(Reg.SP) - CELLL;
-        this.mem.set16(Reg.SP, ds);
-        this.mem.set16(ds, this.mem.PC);
-
-        this.mem.PC = a;
-
-        return;
-      }
 
       case Op.NOT: {
         const b = this.mem.get8(this.mem.PC++);

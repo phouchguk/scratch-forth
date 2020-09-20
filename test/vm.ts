@@ -113,6 +113,54 @@ describe("Vm", function () {
     });
   });
 
+  describe("#jc", function () {
+    it("should jump to its address if carry flag is set", function () {
+      mem.FLAGS = 0;
+
+      const addr = asm.ap;
+      asm.jc(1000);
+      vm.step();
+
+      assert.equal(mem.PC, addr + CELLL + CELLL);
+
+      mem.FLAGS = 1;
+      mem.PC = addr;
+      vm.step();
+
+      assert.equal(mem.PC, 1000);
+
+      mem.FLAGS = 3;
+      mem.PC = addr;
+      vm.step();
+
+      assert.equal(mem.PC, 1000);
+    });
+  });
+
+  describe("#jz", function () {
+    it("should jump to its address if carry flag is set", function () {
+      mem.FLAGS = 0;
+
+      const addr = asm.ap;
+      asm.jz(1000);
+      vm.step();
+
+      assert.equal(mem.PC, addr + CELLL + CELLL);
+
+      mem.FLAGS = 2;
+      mem.PC = addr;
+      vm.step();
+
+      assert.equal(mem.PC, 1000);
+
+      mem.FLAGS = 3;
+      mem.PC = addr;
+      vm.step();
+
+      assert.equal(mem.PC, 1000);
+    });
+  });
+
   describe("#ld8", function () {
     it("should set its byte address to the byte value at its address", function () {
       mem.SP = 0;

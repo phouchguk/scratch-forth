@@ -38,6 +38,14 @@ export class Assembler {
     this.ba(0, a, Op.CALL);
   }
 
+  jc(a: number) {
+    this.ba(0, a, Op.JC);
+  }
+
+  jz(a: number) {
+    this.ba(0, a, Op.JZ);
+  }
+
   ld8(b: number, a: number) {
     this.ba(b, a, Op.LD8);
   }

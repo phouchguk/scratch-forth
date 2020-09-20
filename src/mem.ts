@@ -64,6 +64,10 @@ export class Mem {
     return this.m16[this.flagi];
   }
 
+  set FLAGS(value: number) {
+    this.m16[this.flagi] = value;
+  }
+
   get8(addr: number) {
     return this.m8[addr];
   }
