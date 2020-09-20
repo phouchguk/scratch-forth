@@ -86,7 +86,7 @@ describe("Vm", function () {
       vm.step();
 
       assert.equal(mem.WP, 42);
-      assert.equal(mem.FLAGS, 1);
+      assert.equal(mem.FLAGS, 0);
 
       mem.IP = 0;
 
@@ -94,7 +94,7 @@ describe("Vm", function () {
       vm.step();
 
       assert.equal(mem.WP, 0);
-      assert.equal(mem.FLAGS, 0);
+      assert.equal(mem.FLAGS, 2);
     });
   });
 

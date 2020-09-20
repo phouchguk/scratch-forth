@@ -8,7 +8,7 @@ export const enum Reg {
   SP = 4,
   RP = 6,
   WP = 8,
-  FLAGS = 10,
+  FLAGS = 10, // xxxxxxZC
 }
 
 export const enum Op {
@@ -34,6 +34,18 @@ export class Vm implements IVm {
     this.io = io;
   }
 
+  flags(result: number) {
+    let f = 0;
+
+    f += result >> 16 === 0 ? 0 : 1; // carry
+
+    if (result === 0) {
+      f += 2; // zero
+    }
+
+    this.mem.set16(Reg.FLAGS, f);
+  }
+
   stepbx(op: Op) {
     const b = this.mem.get8(this.mem.PC++);
 
@@ -44,21 +56,24 @@ export class Vm implements IVm {
       case Op.ADC: {
         const result = this.mem.get16(b) + x;
         this.mem.set16(b, result);
-        this.mem.set16(Reg.FLAGS, result >> 16);
+        this.flags(result);
+
         return;
       }
 
       case Op.ADD: {
         const result = this.mem.get16(b) + this.mem.get16(x);
         this.mem.set16(b, result);
-        this.mem.set16(Reg.FLAGS, result >> 16);
+        this.flags(result);
+
         return;
       }
 
       case Op.AND: {
         const result = this.mem.get16(b) & this.mem.get16(x);
-        this.mem.set16(Reg.FLAGS, result === 0 ? 0 : 1);
         this.mem.set16(b, result);
+        this.flags(result);
+
         return;
       }
 
@@ -81,7 +96,8 @@ export class Vm implements IVm {
       case Op.SBC: {
         const result = this.mem.get16(b) - x;
         this.mem.set16(b, result);
-        this.mem.set16(Reg.FLAGS, result >> 16 === 0 ? 0 : 1);
+        this.flags(result);
+
         return;
       }
 
