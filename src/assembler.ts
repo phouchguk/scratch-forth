@@ -30,6 +30,10 @@ export class Assembler {
     this.ba(b, a, Op.ADD);
   }
 
+  and(b: number, a: number) {
+    this.ba(b, a, Op.AND);
+  }
+
   call(a: number) {
     this.ba(0, a, Op.CALL);
   }

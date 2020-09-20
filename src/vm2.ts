@@ -14,6 +14,7 @@ export const enum Reg {
 export const enum Op {
   ADC,
   ADD,
+  AND,
   CALL,
   LD8,
   LDA,
@@ -54,6 +55,13 @@ export class Vm implements IVm {
         return;
       }
 
+      case Op.AND: {
+        const result = this.mem.get16(b) & this.mem.get16(x);
+        this.mem.set16(Reg.FLAGS, result === 0 ? 0 : 1);
+        this.mem.set16(b, result);
+        return;
+      }
+
       case Op.LD8:
         this.mem.set8(b, this.mem.get16(x));
         return;
@@ -73,7 +81,7 @@ export class Vm implements IVm {
       case Op.SBC: {
         const result = this.mem.get16(b) - x;
         this.mem.set16(b, result);
-        this.mem.set16(Reg.FLAGS, 0);
+        this.mem.set16(Reg.FLAGS, result >> 16 === 0 ? 0 : 1);
         return;
       }
 
@@ -90,6 +98,7 @@ export class Vm implements IVm {
     switch (op) {
       case Op.ADC:
       case Op.ADD:
+      case Op.AND:
       case Op.LD8:
       case Op.LDA:
       case Op.LDC:

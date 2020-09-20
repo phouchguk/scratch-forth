@@ -77,6 +77,27 @@ describe("Vm", function () {
     });
   });
 
+  describe("#and", function () {
+    it("should and the value at its address arg to its byte address", function () {
+      mem.WP = 42;
+      mem.IP = 65535;
+
+      asm.and(Reg.WP, Reg.IP);
+      vm.step();
+
+      assert.equal(mem.WP, 42);
+      assert.equal(mem.FLAGS, 1);
+
+      mem.IP = 0;
+
+      asm.and(Reg.WP, Reg.IP);
+      vm.step();
+
+      assert.equal(mem.WP, 0);
+      assert.equal(mem.FLAGS, 0);
+    });
+  });
+
   describe("#call", function () {
     it("should push the address after this instruction to the data stack and jump to its address", function () {
       const sTop = 50;
@@ -168,7 +189,7 @@ describe("Vm", function () {
       vm.step();
 
       assert.equal(mem.WP, 65535);
-      assert.equal(mem.FLAGS, 0);
+      assert.equal(mem.FLAGS, 1);
 
       mem.WP = 0;
 
@@ -176,7 +197,7 @@ describe("Vm", function () {
       vm.step();
 
       assert.equal(mem.WP, 65534);
-      assert.equal(mem.FLAGS, 0);
+      assert.equal(mem.FLAGS, 1);
 
       mem.WP = 42;
 
