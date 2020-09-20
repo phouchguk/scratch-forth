@@ -22,6 +22,10 @@ export class Assembler {
     this.ba(b, a, Op.ADC);
   }
 
+  add(b: number, a: number) {
+    this.ba(b, a, Op.ADD);
+  }
+
   ld8(b: number, a: number) {
     this.ba(b, a, Op.LD8);
   }

@@ -37,15 +37,19 @@ export class Vm implements IVm {
     this.mem.PC += CELLL;
 
     switch (op) {
-      case Op.ADC:
+      case Op.ADC: {
         const result = this.mem.get16(b) + x;
         this.mem.set16(b, result);
         this.mem.set16(Reg.FLAGS, result >> 16);
         return;
+      }
 
-      case Op.ADD:
-        this.mem.set16(b, this.mem.get16(b) + this.mem.get16(x));
+      case Op.ADD: {
+        const result = this.mem.get16(b) + this.mem.get16(x);
+        this.mem.set16(b, result);
+        this.mem.set16(Reg.FLAGS, result >> 16);
         return;
+      }
 
       case Op.LD8:
         this.mem.set8(b, this.mem.get16(x));

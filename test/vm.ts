@@ -55,6 +55,28 @@ describe("Vm", function () {
     });
   });
 
+  describe("#add", function () {
+    it("should add the value at its address arg to its byte address and set the overflow flag", function () {
+      mem.WP = 42;
+      mem.IP = 1;
+
+      asm.add(Reg.WP, Reg.IP);
+      vm.step();
+
+      assert.equal(mem.WP, 43);
+      assert.equal(mem.FLAGS, 0);
+
+      mem.WP = 65535;
+      mem.IP = 1;
+
+      asm.add(Reg.WP, Reg.IP);
+      vm.step();
+
+      assert.equal(mem.WP, 0);
+      assert.equal(mem.FLAGS, 1);
+    });
+  });
+
   describe("#ld8", function () {
     it("should set its byte address to the byte value at its address", function () {
       mem.SP = 0;
