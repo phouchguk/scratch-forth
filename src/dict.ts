@@ -1,5 +1,6 @@
 import { CELLL, EM, Mem } from "./mem";
 import { rpp, spp, tibb } from "./stack";
+import { prims } from "./vm";
 
 const coldd = 0x100;
 const us = 64 * CELLL;
@@ -42,6 +43,7 @@ export class Dict {
     this._user = 0;
 
     this.prepareVars();
+    this.primitives();
   }
 
   prepareVars() {
@@ -143,6 +145,15 @@ export class Dict {
     up += CELLL;
   }
 
+  primitives() {
+    for (let i = 0; i < prims.length; i++) {
+      this.code(prims[i]);
+
+      this.mem.set16(this._code, i);
+      this._code += CELLL;
+    }
+  }
+
   lookup(name: string): number {
     const len = name.length;
     let ptr = this._link;
@@ -235,7 +246,11 @@ export class Dict {
   user(name: string) {
     // can add a blank CELL size space by passing blank name
     if (name) {
-      this.colon(name, [this.lookup("doUSER"), this._user]);
+      this.colon(name, [
+        prims.indexOf("doLIST"),
+        this.lookup("doUSER"),
+        this._user,
+      ]);
     }
 
     this._user += CELLL;

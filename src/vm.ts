@@ -36,8 +36,6 @@ export const prims = [
   "XOR",
   "UM+",
   "doLIST",
-  "EXIT",
-  "$NEXT",
 ];
 
 export class Vm {
@@ -51,6 +49,15 @@ export class Vm {
     this.io = io;
 
     this.stack = new Stack(this.mem);
+  }
+
+  $next() {
+    // set PC to address IP holds
+    this.mem.PC = this.mem.get16(this.mem.IP);
+    //console.log(this.mem.PC);
+
+    // adds CELLL to IP
+    this.mem.IP += CELLL;
   }
 
   step() {
@@ -67,22 +74,30 @@ export class Vm {
         return;
 
       case 1: // KEY
+        console.log("KEY");
         this.running = false;
+        this.$next();
+
         this.io.key(this);
+
         return;
 
       case 2: // TX!
         const c = this.stack.popd();
         this.io.txsto(c);
+        this.$next();
         return;
 
       case 3: // doLIT
-        this.stack.pushd(this.mem.get16(this.mem.PC));
-        this.mem.PC += CELLL;
+        this.stack.pushd(this.mem.get16(this.mem.IP));
+        this.mem.IP += CELLL;
+        this.$next();
         return;
 
       case 4: // EXIT
-        this.mem.PC = this.stack.popr();
+        // pop RS to IP
+        this.mem.IP = this.stack.popr();
+        this.$next();
         return;
 
       case 5: // EXECUTE
@@ -97,13 +112,15 @@ export class Vm {
         if (count < 0) {
           // when count goes below 0, pop the count, skip over address after 'next' instruction
           this.stack.popr();
-          this.mem.PC += CELLL;
+
+          this.mem.IP += CELLL;
         } else {
           // otherwise set the dec'd count, jump to address after 'next' instruction
           this.mem.set16(this.mem.RP, count);
-          this.mem.PC = this.mem.get16(this.mem.PC);
+          this.mem.IP = this.mem.get16(this.mem.IP);
         }
 
+        this.$next();
         return;
 
       case 7: // ?branch
@@ -111,74 +128,89 @@ export class Vm {
 
         if (flag === 0) {
           // branch
-          this.mem.PC = this.mem.get16(this.mem.PC);
+          this.mem.IP = this.mem.get16(this.mem.IP);
         } else {
           // don't branch, skip branch address
-          this.mem.PC += CELLL;
+          this.mem.IP += CELLL;
         }
 
+        this.$next();
         return;
 
       case 8: // branch
-        this.mem.PC = this.mem.get16(this.mem.PC);
+        this.mem.IP = this.mem.get16(this.mem.IP);
+        this.$next();
         return;
 
       case 9: {
         // !
         const addr = this.stack.popd();
         this.mem.set16(addr, this.stack.popd());
+        this.$next();
         return;
       }
 
       case 10: // @
         this.stack.pushd(this.mem.get16(this.stack.popd()));
+        this.$next();
         return;
 
       case 11: {
         // C!
         const addr = this.stack.popd();
         this.mem.set8(addr, this.stack.popd());
+        this.$next();
         return;
       }
 
       case 12: // C@
         this.stack.pushd(this.mem.get8(this.stack.popd()));
+        this.$next();
         return;
 
       case 13: // RP@
         this.stack.pushd(this.mem.RP);
+        this.$next();
         return;
 
       case 14: // RP!
         this.mem.RP = this.stack.popd();
+        this.$next();
         return;
 
       case 15: // R>
         this.stack.pushd(this.stack.popr());
+        this.$next();
         return;
 
       case 16: // R@
         this.stack.pushd(this.mem.get16(this.mem.RP));
+        this.$next();
         return;
 
       case 17: // >R
         this.stack.pushr(this.stack.popd());
+        this.$next();
         return;
 
       case 18: // SP@
         this.stack.pushd(this.mem.SP);
+        this.$next();
         return;
 
       case 19: // SP!
         this.mem.SP = this.stack.popd();
+        this.$next();
         return;
 
       case 20: // DROP
         this.stack.popd();
+        this.$next();
         return;
 
       case 21: // DUP
         this.stack.pushd(this.mem.get16(this.mem.SP));
+        this.$next();
         return;
 
       case 22: // SWAP
@@ -186,29 +218,35 @@ export class Vm {
         const temp2 = this.stack.popd();
         this.stack.pushd(temp1);
         this.stack.pushd(temp2);
+        this.$next();
 
         return;
 
       case 23: // OVER
         // stack grows down, the previous cell is up
         this.stack.pushd(this.mem.get16(this.mem.SP + CELLL));
+        this.$next();
         return;
 
       case 24: // 0<
         const test = this.stack.popd();
         this.stack.pushd(test & signFlag ? minus1 : 0);
+        this.$next();
         return;
 
       case 25: // AND
         this.stack.pushd(this.stack.popd() & this.stack.popd());
+        this.$next();
         return;
 
       case 26: // OR
         this.stack.pushd(this.stack.popd() | this.stack.popd());
+        this.$next();
         return;
 
       case 27: // XOR
         this.stack.pushd(this.stack.popd() ^ this.stack.popd());
+        this.$next();
         return;
 
       case 28: // UM+
@@ -217,39 +255,25 @@ export class Vm {
 
         this.stack.pushd(ax & minus1);
         this.stack.pushd(ax >> 16);
+
+        this.$next();
         return;
 
       case 29: // doLIST
-        // start of compound list is doLIST followed by a $NEXT
-        // pc points at $NEXT after doLIST
+        // start of compound list is doLIST
+        // pc points at cell after doLIST
 
         // push IP to RS
         this.stack.pushr(this.mem.IP);
 
-        // set IP to pc + CELLL (cell after $NEXT)
-        this.mem.IP = this.mem.PC + CELLL;
+        // set IP to pc (cell after doLIST)
+        this.mem.IP = this.mem.PC;
 
+        this.$next();
         return;
-
-      case 30: // EXIT
-        // exit is followed by a $NEXT
-
-        // pop RS to IP
-        this.mem.IP = this.stack.popr();
-
-        return;
-
-      case 31: // $NEXT
-        // sets PC to IP
-        this.mem.PC = this.mem.IP;
-
-        // adds CELLL to IP
-        this.mem.IP += CELLL;
 
       default:
-        // run compound proc
-        this.stack.pushr(this.mem.PC);
-        this.mem.PC = op;
+        throw new Error("bad op: " + op);
     }
   }
 

@@ -28,13 +28,6 @@ function compile(x: string) {
     return parseInt(x, 10);
   }
 
-  const pi = prims.indexOf(x);
-
-  if (pi > -1) {
-    // primitive
-    return pi;
-  }
-
   if (vars[x]) {
     // variable
     return vars[x];
@@ -58,12 +51,12 @@ function parse(l: string) {
     return;
   }
 
-  const code: string[] = [];
+  const code: string[] = [prims.indexOf("doLIST") + ""];
   const insts = parts.slice(1);
   const labels: { [key: string]: number } = {};
 
   // extract labels
-  let codeLen = 0;
+  let codeLen = 1;
   let byteMode = false;
 
   for (let i = 0; i < insts.length; i++) {
