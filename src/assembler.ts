@@ -18,6 +18,14 @@ export class Assembler {
     this.ap += CELLL;
   }
 
+  adc(b: number, a: number) {
+    this.ba(b, a, Op.ADC);
+  }
+
+  ld8(b: number, a: number) {
+    this.ba(b, a, Op.LD8);
+  }
+
   lda(b: number, a: number) {
     this.ba(b, a, Op.LDA);
   }

@@ -19,6 +19,59 @@ describe("Vm", function () {
     vm = new Vm(mem, io);
   });
 
+  describe("#adc", function () {
+    it("should add its argument to its byte address and set the overflow flag", function () {
+      mem.WP = 42;
+
+      asm.adc(Reg.WP, 1);
+      vm.step();
+
+      assert.equal(mem.WP, 43);
+      assert.equal(mem.FLAGS, 0);
+
+      mem.WP = 65535;
+
+      asm.adc(Reg.WP, 1);
+      vm.step();
+
+      assert.equal(mem.WP, 0);
+      assert.equal(mem.FLAGS, 1);
+
+      mem.WP = 65535;
+
+      asm.adc(Reg.WP, 2);
+      vm.step();
+
+      assert.equal(mem.WP, 1);
+      assert.equal(mem.FLAGS, 1);
+
+      mem.WP = 42;
+
+      asm.adc(Reg.WP, 1);
+      vm.step();
+
+      assert.equal(mem.WP, 43);
+      assert.equal(mem.FLAGS, 0);
+    });
+  });
+
+  describe("#ld8", function () {
+    it("should set its byte address to the byte value at its address", function () {
+      mem.SP = 0;
+      mem.WP = 42;
+      mem.IP = 0;
+
+      // least significant first
+      asm.ld8(Reg.SP, Reg.WP);
+      asm.ld8(Reg.SP + 1, Reg.IP);
+
+      vm.step();
+      vm.step();
+
+      assert.equal(mem.SP, 42);
+    });
+  });
+
   describe("#lda", function () {
     it("should set its byte address to the value at its address", function () {
       mem.SP = 100;

@@ -12,6 +12,7 @@ export class Mem {
   readonly spi = 2; // data stack pointer
   readonly rpi = 3; // return stack pointer
   readonly wpi = 4; // work pointer
+  readonly flagi = 5; // flags
 
   constructor(mem: ArrayBuffer) {
     this.mem = mem;
@@ -57,6 +58,10 @@ export class Mem {
 
   set WP(value: number) {
     this.m16[this.wpi] = value;
+  }
+
+  get FLAGS() {
+    return this.m16[this.flagi];
   }
 
   get8(addr: number) {
