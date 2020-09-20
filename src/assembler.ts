@@ -58,11 +58,19 @@ export class Assembler {
     this.b(b, Op.NOT);
   }
 
+  or(b: number, a: number) {
+    this.ba(b, a, Op.OR);
+  }
+
   sbc(b: number, a: number) {
     this.ba(b, a, Op.SBC);
   }
 
   sti(b: number, a: number) {
     this.ba(b, a, Op.STI);
+  }
+
+  xor(b: number, a: number) {
+    this.ba(b, a, Op.XOR);
   }
 }

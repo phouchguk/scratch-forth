@@ -173,6 +173,19 @@ describe("Vm", function () {
     });
   });
 
+  describe("#or", function () {
+    it("should OR the value at its address arg to its byte address", function () {
+      mem.WP = 42;
+      mem.IP = 65535;
+
+      asm.or(Reg.WP, Reg.IP);
+      vm.step();
+
+      assert.equal(mem.WP, 65535);
+      assert.equal(mem.FLAGS, 0);
+    });
+  });
+
   describe("#sbc", function () {
     it("should sub its argument from its byte address, ignores overflow flag", function () {
       mem.WP = 42;
@@ -240,6 +253,27 @@ describe("Vm", function () {
       vm.step();
 
       assert.equal(mem.WP, 0);
+    });
+  });
+
+  describe("#xor", function () {
+    it("should XOR the value at its address arg to its byte address", function () {
+      mem.WP = 42;
+      mem.IP = 65535;
+
+      asm.xor(Reg.WP, Reg.IP);
+      vm.step();
+
+      assert.equal(mem.WP, 65493);
+      assert.equal(mem.FLAGS, 0);
+
+      mem.WP = 0;
+
+      asm.xor(Reg.WP, Reg.IP);
+      vm.step();
+
+      assert.equal(mem.WP, 65535);
+      assert.equal(mem.FLAGS, 0);
     });
   });
 });

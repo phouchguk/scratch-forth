@@ -16,13 +16,18 @@ export const enum Op {
   ADD,
   AND,
   CALL,
+  INT,
+  JC,
+  JZ,
   LD8,
   LDA,
   LDC,
   LDI,
   NOT,
+  OR,
   SBC,
   STI,
+  XOR,
 }
 
 export class Vm implements IVm {
@@ -93,6 +98,14 @@ export class Vm implements IVm {
         this.mem.set16(b, this.mem.get16(this.mem.get16(x)));
         return;
 
+      case Op.OR: {
+        const result = this.mem.get16(b) | this.mem.get16(x);
+        this.mem.set16(b, result);
+        this.flags(result);
+
+        return;
+      }
+
       case Op.SBC: {
         const result = this.mem.get16(b) - x;
         this.mem.set16(b, result);
@@ -104,6 +117,14 @@ export class Vm implements IVm {
       case Op.STI:
         this.mem.set16(this.mem.get16(x), this.mem.get16(b));
         return;
+
+      case Op.XOR: {
+        const result = this.mem.get16(b) ^ this.mem.get16(x);
+        this.mem.set16(b, result);
+        this.flags(result);
+
+        return;
+      }
     }
   }
 
@@ -119,8 +140,10 @@ export class Vm implements IVm {
       case Op.LDA:
       case Op.LDC:
       case Op.LDI:
+      case Op.OR:
       case Op.SBC:
       case Op.STI:
+      case Op.XOR:
         this.stepbx(op as Op);
         return;
 
