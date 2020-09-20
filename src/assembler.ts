@@ -10,9 +10,13 @@ export class Assembler {
     this.mem = mem;
   }
 
-  private ba(b: number, a: number, op: Op) {
+  private b(b: number, op: Op) {
     this.mem.set8(this.ap++, op);
     this.mem.set8(this.ap++, b);
+  }
+
+  private ba(b: number, a: number, op: Op) {
+    this.b(b, op);
 
     this.mem.set16(this.ap, a);
     this.ap += CELLL;
@@ -44,6 +48,10 @@ export class Assembler {
 
   ldi(b: number, a: number) {
     this.ba(b, a, Op.LDI);
+  }
+
+  not(b: number) {
+    this.b(b, Op.NOT);
   }
 
   sbc(b: number, a: number) {

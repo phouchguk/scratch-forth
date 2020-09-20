@@ -19,6 +19,7 @@ export const enum Op {
   LDA,
   LDC,
   LDI,
+  NOT,
   SBC,
   STI,
 }
@@ -108,6 +109,13 @@ export class Vm implements IVm {
         this.mem.set16(ds, this.mem.PC);
 
         this.mem.PC = a;
+
+        return;
+      }
+
+      case Op.NOT: {
+        const b = this.mem.get8(this.mem.PC++);
+        this.mem.set16(b, ~this.mem.get16(b));
 
         return;
       }

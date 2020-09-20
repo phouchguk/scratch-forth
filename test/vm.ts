@@ -205,4 +205,20 @@ describe("Vm", function () {
       assert.equal(mem.get16(addr), value);
     });
   });
+
+  describe("#not", function () {
+    it("should set its byte address to the value at its address", function () {
+      mem.WP = 0;
+
+      asm.not(Reg.WP);
+      vm.step();
+
+      assert.equal(mem.WP, 65535);
+
+      asm.not(Reg.WP);
+      vm.step();
+
+      assert.equal(mem.WP, 0);
+    });
+  });
 });
