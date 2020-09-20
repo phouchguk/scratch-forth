@@ -35,6 +35,9 @@ export const prims = [
   "OR",
   "XOR",
   "UM+",
+  "doLIST",
+  "EXIT",
+  "$NEXT",
 ];
 
 export class Vm {
@@ -215,6 +218,33 @@ export class Vm {
         this.stack.pushd(ax & minus1);
         this.stack.pushd(ax >> 16);
         return;
+
+      case 29: // doLIST
+        // start of compound list is doLIST followed by a $NEXT
+        // pc points at $NEXT after doLIST
+
+        // push IP to RS
+        this.stack.pushr(this.mem.IP);
+
+        // set IP to pc + CELLL (cell after $NEXT)
+        this.mem.IP = this.mem.PC + CELLL;
+
+        return;
+
+      case 30: // EXIT
+        // exit is followed by a $NEXT
+
+        // pop RS to IP
+        this.mem.IP = this.stack.popr();
+
+        return;
+
+      case 31: // $NEXT
+        // sets PC to IP
+        this.mem.PC = this.mem.IP;
+
+        // adds CELLL to IP
+        this.mem.IP += CELLL;
 
       default:
         // run compound proc
