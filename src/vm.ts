@@ -74,7 +74,6 @@ export class Vm {
         return;
 
       case 1: // KEY
-        console.log("KEY");
         this.running = false;
         this.$next();
 
@@ -84,8 +83,10 @@ export class Vm {
 
       case 2: // TX!
         const c = this.stack.popd();
-        this.io.txsto(c);
         this.$next();
+
+        this.io.txsto(c);
+
         return;
 
       case 3: // doLIT
@@ -101,7 +102,6 @@ export class Vm {
         return;
 
       case 5: // EXECUTE
-        this.stack.pushr(this.mem.PC);
         this.mem.PC = this.stack.popd();
         return;
 

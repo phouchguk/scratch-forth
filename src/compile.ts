@@ -33,7 +33,13 @@ function compile(x: string) {
     return vars[x];
   }
 
-  return (dictm as Dict).lookup(x);
+  const addr = (dictm as Dict).lookup(x);
+
+  if (addr % 2 !== 0) {
+    throw new Error(`bad address ${addr} for ${x}`);
+  }
+
+  return addr;
 }
 
 const trim = (s: string) => s.trim();
@@ -56,7 +62,7 @@ function parse(l: string) {
   const labels: { [key: string]: number } = {};
 
   // extract labels
-  let codeLen = 1;
+  let codeLen = CELLL;
   let byteMode = false;
 
   for (let i = 0; i < insts.length; i++) {
