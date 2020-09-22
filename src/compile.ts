@@ -22,6 +22,7 @@ vars["COMPO"] = 0x40;
 vars["IMEDD"] = 0x80;
 vars["TIBB"] = tibb;
 vars["ERR"] = 27;
+vars["DOLST"] = prims.indexOf("doLIST");
 
 function compile(x: string) {
   if (isNr.test(x)) {
