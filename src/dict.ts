@@ -22,6 +22,13 @@ export function align(n: number): number {
 export const labelOffset = 65536;
 export const byteModeSwitch = 70000;
 
+const compos: string[] = 'doLIT doLIST next ?branch branch RP! >R doVAR doUSER tmp doVOC do$ $"| ."| abort" xio COMPILE ;'.split(
+  " "
+);
+const imedds: string[] = '.( ( \\ [ [COMPILE] LITERAL RECURSE FOR BEGIN NEXT UNTIL AGAIN IF AHEAD REPEAT THEN AFT ELSE WHILE ABORT" $" ." ;'.split(
+  " "
+);
+
 export class Dict {
   _link: number;
   _name: number;
@@ -161,7 +168,7 @@ export class Dict {
     while (ptr !== 0) {
       const start = ptr; // start of name (len + chars)
       const prev = this.mem.get16(start - CELLL); // previous word is one cell behind
-      const dictLen = this.mem.get8(ptr++);
+      const dictLen = this.mem.get8(ptr++) & 0x7f1f;
 
       if (dictLen !== len) {
         ptr = prev;
@@ -203,7 +210,17 @@ export class Dict {
     this.mem.set16(this.lastAddr, this._link);
 
     // name len (lex)
-    this.mem.set8(ptr++, lex);
+    let tagged = lex;
+
+    if (compos.indexOf(name) > -1) {
+      tagged += 0x40;
+    }
+
+    if (imedds.indexOf(name) > -1) {
+      tagged += 0x80;
+    }
+
+    this.mem.set8(ptr++, tagged);
 
     // name chars
     for (let i = 0; i < lex; i++) {
