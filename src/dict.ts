@@ -84,6 +84,10 @@ export class Dict {
     this.mem.set16(up, tibb); // the buffer address
     up += CELLL;
 
+    // CSP
+    this.mem.set16(up, 0);
+    up += CELLL;
+
     // HLD
     this.mem.set16(up, 0);
     up += CELLL;
