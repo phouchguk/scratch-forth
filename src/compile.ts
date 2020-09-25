@@ -8,6 +8,8 @@ import { tibb } from "./stack";
 let dictm: Dict | null = null;
 
 const isNr = /^-?\d+$/;
+const ver = 1;
+const ext = 1;
 
 const vars: { [key: string]: number } = {};
 
@@ -23,6 +25,7 @@ vars["IMEDD"] = 0x80;
 vars["TIBB"] = tibb;
 vars["ERR"] = 27;
 vars["DOLST"] = prims.indexOf("doLIST");
+vars["VEREXT"] = ver * 256 + ext;
 
 function compile(x: string) {
   if (isNr.test(x)) {
@@ -119,7 +122,7 @@ export function build() {
     const lines = data.split("\n");
 
     lines.map(trim).forEach(parse);
-    mem.PC = (dictm as Dict).lookup("START");
+    mem.PC = (dictm as Dict).lookup("COLD");
 
     dump(mem);
   });
