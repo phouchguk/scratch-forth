@@ -1,5 +1,4 @@
-import { CELLL, EM, Mem } from "./mem";
-import { rpp, spp, tibb } from "./stack";
+import { CELLL, EM, Mem, rpp, spp, tibb } from "./mem";
 import { prims } from "./vm";
 
 const coldd = 0x100;

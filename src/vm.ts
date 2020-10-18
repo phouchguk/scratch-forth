@@ -1,6 +1,6 @@
 import { CELLL, Mem } from "./mem";
 import { Io } from "./io";
-import { Stack } from "./stack";
+import { VmStack } from "./vmstack";
 
 const minus1 = Math.pow(2, CELLL * 8) - 1;
 const signFlag = 1 << (CELLL * 8 - 1);
@@ -41,14 +41,16 @@ export const prims = [
 export class Vm {
   private mem: Mem;
   private io: Io;
-  private stack: Stack;
+  private ds: VmStack;
+  private rs: VmStack;
   private running: boolean = false;
 
   constructor(mem: Mem, io: Io) {
     this.mem = mem;
     this.io = io;
 
-    this.stack = new Stack(this.mem);
+    this.ds = new VmStack(this.mem, 4);
+    this.rs = new VmStack(this.mem, 6);
   }
 
   $next() {
@@ -82,7 +84,7 @@ export class Vm {
         return;
 
       case 2: // TX!
-        const c = this.stack.popd();
+        const c = this.ds.pop();
         this.$next();
 
         this.io.txsto(c);
@@ -90,19 +92,19 @@ export class Vm {
         return;
 
       case 3: // doLIT
-        this.stack.pushd(this.mem.get16(this.mem.IP));
+        this.ds.push(this.mem.get16(this.mem.IP));
         this.mem.IP += CELLL;
         this.$next();
         return;
 
       case 4: // EXIT
         // pop RS to IP
-        this.mem.IP = this.stack.popr();
+        this.mem.IP = this.rs.pop();
         this.$next();
         return;
 
       case 5: // EXECUTE
-        this.mem.PC = this.stack.popd();
+        this.mem.PC = this.ds.pop();
         return;
 
       case 6: // next
@@ -111,7 +113,7 @@ export class Vm {
 
         if (count < 0) {
           // when count goes below 0, pop the count, skip over address after 'next' instruction
-          this.stack.popr();
+          this.rs.pop();
 
           this.mem.IP += CELLL;
         } else {
@@ -124,7 +126,7 @@ export class Vm {
         return;
 
       case 7: // ?branch
-        const flag = this.stack.popd();
+        const flag = this.ds.pop();
 
         if (flag === 0) {
           // branch
@@ -144,117 +146,117 @@ export class Vm {
 
       case 9: {
         // !
-        const addr = this.stack.popd();
-        this.mem.set16(addr, this.stack.popd());
+        const addr = this.ds.pop();
+        this.mem.set16(addr, this.ds.pop());
         this.$next();
         return;
       }
 
       case 10: // @
-        this.stack.pushd(this.mem.get16(this.stack.popd()));
+        this.ds.push(this.mem.get16(this.ds.pop()));
         this.$next();
         return;
 
       case 11: {
         // C!
-        const addr = this.stack.popd();
-        this.mem.set8(addr, this.stack.popd());
+        const addr = this.ds.pop();
+        this.mem.set8(addr, this.ds.pop());
         this.$next();
         return;
       }
 
       case 12: // C@
-        this.stack.pushd(this.mem.get8(this.stack.popd()));
+        this.ds.push(this.mem.get8(this.ds.pop()));
         this.$next();
         return;
 
       case 13: // RP@
-        this.stack.pushd(this.mem.RP);
+        this.ds.push(this.mem.RP);
         this.$next();
         return;
 
       case 14: // RP!
-        this.mem.RP = this.stack.popd();
+        this.mem.RP = this.ds.pop();
         this.$next();
         return;
 
       case 15: // R>
-        this.stack.pushd(this.stack.popr());
+        this.ds.push(this.rs.pop());
         this.$next();
         return;
 
       case 16: // R@
-        this.stack.pushd(this.mem.get16(this.mem.RP));
+        this.ds.push(this.mem.get16(this.mem.RP));
         this.$next();
         return;
 
       case 17: // >R
-        this.stack.pushr(this.stack.popd());
+        this.rs.push(this.ds.pop());
         this.$next();
         return;
 
       case 18: // SP@
-        this.stack.pushd(this.mem.SP);
+        this.ds.push(this.mem.SP);
         this.$next();
         return;
 
       case 19: // SP!
-        this.mem.SP = this.stack.popd();
+        this.mem.SP = this.ds.pop();
         this.$next();
         return;
 
       case 20: // DROP
-        this.stack.popd();
+        this.ds.pop();
         this.$next();
         return;
 
       case 21: // DUP
-        this.stack.pushd(this.mem.get16(this.mem.SP));
+        this.ds.push(this.mem.get16(this.mem.SP));
         this.$next();
         return;
 
       case 22: // SWAP
-        const temp1 = this.stack.popd();
-        const temp2 = this.stack.popd();
-        this.stack.pushd(temp1);
-        this.stack.pushd(temp2);
+        const temp1 = this.ds.pop();
+        const temp2 = this.ds.pop();
+        this.ds.push(temp1);
+        this.ds.push(temp2);
         this.$next();
 
         return;
 
       case 23: // OVER
         // stack grows down, the previous cell is up
-        this.stack.pushd(this.mem.get16(this.mem.SP + CELLL));
+        this.ds.push(this.mem.get16(this.mem.SP + CELLL));
         this.$next();
         return;
 
       case 24: // 0<
-        const test = this.stack.popd();
-        this.stack.pushd(test & signFlag ? minus1 : 0);
+        const test = this.ds.pop();
+        this.ds.push(test & signFlag ? minus1 : 0);
         this.$next();
         return;
 
       case 25: // AND
-        this.stack.pushd(this.stack.popd() & this.stack.popd());
+        this.ds.push(this.ds.pop() & this.ds.pop());
         this.$next();
         return;
 
       case 26: // OR
-        this.stack.pushd(this.stack.popd() | this.stack.popd());
+        this.ds.push(this.ds.pop() | this.ds.pop());
         this.$next();
         return;
 
       case 27: // XOR
-        this.stack.pushd(this.stack.popd() ^ this.stack.popd());
+        this.ds.push(this.ds.pop() ^ this.ds.pop());
         this.$next();
         return;
 
       case 28: // UM+
-        let bx = this.stack.popd();
-        let ax = this.stack.popd() + bx;
+        let bx = this.ds.pop();
+        let ax = this.ds.pop() + bx;
 
-        this.stack.pushd(ax & minus1);
-        this.stack.pushd(ax >> 16);
+        this.ds.push(ax & minus1);
+        this.ds.push(ax >> 16);
 
         this.$next();
         return;
@@ -264,7 +266,7 @@ export class Vm {
         // pc points at cell after doLIST
 
         // push IP to RS
-        this.stack.pushr(this.mem.IP);
+        this.rs.push(this.mem.IP);
 
         // set IP to pc (cell after doLIST)
         this.mem.IP = this.mem.PC;
@@ -286,6 +288,6 @@ export class Vm {
   }
 
   pushd(c: number) {
-    this.stack.pushd(c);
+    this.ds.push(c);
   }
 }

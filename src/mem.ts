@@ -1,6 +1,10 @@
 export const CELLL = 2;
 export const EM = 0x4000;
 export const REG_TOP = 5 * CELLL;
+const rts = 64 * CELLL;
+export const rpp = EM - 8 * CELLL;
+export const tibb = rpp - rts;
+export const spp = tibb - 8 * CELLL;
 
 export class Mem {
   mem: ArrayBuffer;
@@ -11,7 +15,6 @@ export class Mem {
   readonly ipi = 1; // interpreter pointer
   readonly spi = 2; // data stack pointer
   readonly rpi = 3; // return stack pointer
-  readonly wpi = 4; // work pointer
 
   constructor(mem: ArrayBuffer) {
     this.mem = mem;
@@ -49,14 +52,6 @@ export class Mem {
 
   set SP(value: number) {
     this.m16[this.spi] = value;
-  }
-
-  get WP() {
-    return this.m16[this.wpi];
-  }
-
-  set WP(value: number) {
-    this.m16[this.wpi] = value;
   }
 
   get8(addr: number) {

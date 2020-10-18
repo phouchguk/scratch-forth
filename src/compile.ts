@@ -1,9 +1,8 @@
 import { readFile, writeFile } from "fs";
 
-import { CELLL, EM, Mem } from "./mem";
+import { CELLL, EM, Mem, rpp, tibb, spp  } from "./mem";
 import { align, byteModeSwitch, labelOffset, upp, Dict } from "./dict";
 import { prims } from "./vm";
-import { tibb } from "./stack";
 
 let dictm: Dict | null = null;
 
@@ -123,6 +122,8 @@ export function build() {
 
     lines.map(trim).forEach(parse);
     mem.PC = (dictm as Dict).lookup("COLD");
+    mem.SP = spp;
+    mem.RP = rpp;
 
     dump(mem);
   });
