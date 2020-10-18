@@ -37,21 +37,17 @@ void push (int stack, unsigned short value) {
   set16(p, value);
 }
 
-unsigned short setToIP(int reg) {
-  unsigned short ip = get16(IP);
-  set16(reg, get16(ip));
-  set16(IP, ip + CELLL);
-
-  return ip;
-}
-
 void next() {
-  setToIP(PC);
+  unsigned short ip = get16(IP);
+  set16(PC, get16(ip));
+  set16(IP, ip + CELLL);
 }
 
 void step() {
   unsigned short pc = get16(PC);
   unsigned short op = get16(pc);
+
+  set16(PC, pc + CELLL);
 
   printf("OP: %u\n", op);
 
@@ -62,26 +58,34 @@ void step() {
 
   case 1: // KEY
     push(SP, getc(stdin));
+
     next();
     return;
 
   case 2: // TX!
     putc(pop(SP), stdout);
+
     next();
     return;
 
   case 3: // doLIT
-    push(SP, setToIP(SP));
-    next();
-    return;
+    {
+      unsigned short ip = get16(IP);
+      set16(IP, ip + CELLL);
+      push(SP, get16(ip));
+
+      next();
+      return;
+    }
 
   case 4: // EXIT
     set16(IP, pop(RP));
+
     next();
     return;
 
   case 5: // EXECUTE
-    set16(PC, pop(RP));
+    set16(PC, pop(SP));
     return;
 
   case 6: // next
@@ -94,7 +98,7 @@ void step() {
         pop(RP);
         set16(IP, get16(IP) + CELLL);
       } else {
-        // otherwise set the dec'd count, jump to address after 'next' instruction
+        // otherwise set the dec'd count, point to instruction after 'next' instruction
         set16(RP, count);
         set16(IP, get16(get16(IP)));
       }
@@ -121,6 +125,7 @@ void step() {
 
   case 8: // branch
     set16(IP, get16(get16(IP)));
+
     next();
     return;
 
@@ -128,12 +133,14 @@ void step() {
     {
       int addr = pop(SP);
       set16(addr, pop(SP));
+
       next();
       return;
     }
 
   case 10: // @
     push(SP, get16(pop(SP)));
+
     next();
     return;
 
@@ -141,57 +148,68 @@ void step() {
     {
       int addr = pop(SP);
       m8[addr] = pop(SP);
+
       next();
       return;
     }
 
   case 12: // C@
     push(SP, m8[pop(SP)]);
+
     next();
     return;
 
   case 13: // RP@
     push(SP, get16(RP));
+
     next();
     return;
 
   case 14: // RP!
     set16(RP, pop(SP));
+
     next();
     return;
 
   case 15: // R>
     push(SP, pop(RP));
+
     next();
     return;
 
-  case 16: // RP@
-    push(SP, get16(RP));
+  case 16: // R@
+    push(SP, get16(get16(RP)));
+
     next();
     return;
 
   case 17: // >R
     push(RP, pop(SP));
+
     next();
     return;
 
   case 18: // SP@
     push(SP, get16(SP));
+
     next();
     return;
 
   case 19: // SP!
     set16(SP, pop(SP));
+
     next();
     return;
 
   case 20: // DROP
     pop(SP);
+
     next();
     return;
 
   case 21: // DUP
     push(SP, get16(get16(SP)));
+
     next();
     return;
 
