@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdint.h>
 
 #define PC 0
 #define IP 2
@@ -8,69 +9,69 @@
 
 #define CELLL 2
 
-unsigned short minus1 = 65535;
-unsigned short signFlag = 32768;
+uint16_t minus1 = 65535;
+uint16_t signFlag = 32768;
 
-unsigned char m8[0x4000];
-unsigned char running = 1;
+uint8_t m8[0x4000];
+uint8_t running = 1;
 
-unsigned short get16(int addr) {
+uint16_t get16(int addr) {
   return (m8[addr + 1] << 8) + m8[addr];
 }
 
-void set16(int addr, unsigned short value) {
+void set16(int addr, uint16_t value) {
   m8[addr] = value;
   m8[addr + 1] = value >> 8;
 }
 
-unsigned short pop(int stack) {
-  unsigned short p = get16(stack);
-  unsigned short value = get16(p);
+uint16_t pop(int stack) {
+  uint16_t p = get16(stack);
+  uint16_t value = get16(p);
   set16(stack, p + CELLL);
 
   return value;
 }
 
-void push (int stack, unsigned short value) {
-  unsigned short p = get16(stack) - CELLL;
+void push (int stack, uint16_t value) {
+  uint16_t p = get16(stack) - CELLL;
   set16(stack, p);
   set16(p, value);
 }
 
 void next() {
-  unsigned short ip = get16(IP);
+  uint16_t ip = get16(IP);
   set16(PC, get16(ip));
   set16(IP, ip + CELLL);
 }
 
 void step() {
-  unsigned short pc = get16(PC);
-  unsigned short op = get16(pc);
+  uint16_t pc = get16(PC);
+  uint16_t op = get16(pc);
 
   set16(PC, pc + CELLL);
 
   printf("OP: %u\n", op);
 
   switch (op) {
-  case 0: // BYE
+  case 0: /* BYE */
     running = 0;
     return;
 
-  case 1: // KEY
+  case 1: /* KEY */
     push(SP, getc(stdin));
 
     next();
     return;
 
-  case 2: // TX!
+  case 2: /* TX! */
     putc(pop(SP), stdout);
 
     next();
     return;
 
-  case 3: // doLIT
+  case 3: /* doLIT */
     {
-      unsigned short ip = get16(IP);
+      uint16_t ip = get16(IP);
       set16(IP, ip + CELLL);
       push(SP, get16(ip));
 
@@ -78,28 +79,28 @@ void step() {
       return;
     }
 
-  case 4: // EXIT
+  case 4: /* EXIT */
     set16(IP, pop(RP));
 
     next();
     return;
 
-  case 5: // EXECUTE
+  case 5: /* EXECUTE */
     set16(PC, pop(SP));
     return;
 
-  case 6: // next
+  case 6: /* next */
     {
-      // count is on the return stack
-      short count = get16(get16(RP)) - 1;
+      /* count is on the return stack */
+      uint16_t count = get16(get16(RP));
 
-      if (count < 0) {
-        // when count goes below 0, pop the count, skip over address after 'next' instruction
+      if (count == 0) {
+        /* count will go below 0, pop the count, skip over address after 'next' instruction */
         pop(RP);
         set16(IP, get16(IP) + CELLL);
       } else {
-        // otherwise set the dec'd count, point to instruction after 'next' instruction
-        set16(RP, count);
+        /* otherwise set the dec'd count, point to instruction after 'next' instruction */
+        set16(RP, count - 1);
         set16(IP, get16(get16(IP)));
       }
 
@@ -107,15 +108,13 @@ void step() {
       return;
     }
 
-  case 7: // ?branch (branch if 0)
+  case 7: /* ?branch (branch if 0) */
     {
-      short flag = pop(SP);
-
-      if (flag == 0) {
-        // branch
+      if (pop(SP) == 0) {
+        /* branch */
         set16(IP, get16(get16(IP)));
       } else {
-        // don't branch, skip branch address
+        /* don't branch, skip branch address */
         set16(IP, get16(IP) + CELLL);
       }
 
@@ -123,13 +122,13 @@ void step() {
       return;
     }
 
-  case 8: // branch
+  case 8: /* branch */
     set16(IP, get16(get16(IP)));
 
     next();
     return;
 
-  case 9: // !
+  case 9: /* ! */
     {
       int addr = pop(SP);
       set16(addr, pop(SP));
@@ -138,13 +137,13 @@ void step() {
       return;
     }
 
-  case 10: // @
+  case 10: /* @ */
     push(SP, get16(pop(SP)));
 
     next();
     return;
 
-  case 11: // C!
+  case 11: /* C! */
     {
       int addr = pop(SP);
       m8[addr] = pop(SP);
@@ -153,70 +152,70 @@ void step() {
       return;
     }
 
-  case 12: // C@
+  case 12: /* C@ */
     push(SP, m8[pop(SP)]);
 
     next();
     return;
 
-  case 13: // RP@
+  case 13: /* RP@ */
     push(SP, get16(RP));
 
     next();
     return;
 
-  case 14: // RP!
+  case 14: /* RP! */
     set16(RP, pop(SP));
 
     next();
     return;
 
-  case 15: // R>
+  case 15: /* R> */
     push(SP, pop(RP));
 
     next();
     return;
 
-  case 16: // R@
+  case 16: /* R@ */
     push(SP, get16(get16(RP)));
 
     next();
     return;
 
-  case 17: // >R
+  case 17: /* >R */
     push(RP, pop(SP));
 
     next();
     return;
 
-  case 18: // SP@
+  case 18: /* SP@ */
     push(SP, get16(SP));
 
     next();
     return;
 
-  case 19: // SP!
+  case 19: /* SP! */
     set16(SP, pop(SP));
 
     next();
     return;
 
-  case 20: // DROP
+  case 20: /* DROP */
     pop(SP);
 
     next();
     return;
 
-  case 21: // DUP
+  case 21: /* DUP */
     push(SP, get16(get16(SP)));
 
     next();
     return;
 
-  case 22: // SWAP
+  case 22: /* SWAP */
     {
-      unsigned short temp1 = pop(SP);
-      unsigned short temp2 = pop(SP);
+      uint16_t temp1 = pop(SP);
+      uint16_t temp2 = pop(SP);
 
       push(SP, temp1);
       push(SP, temp2);
@@ -225,39 +224,39 @@ void step() {
       return;
     }
 
-  case 23: // OVER
+  case 23: /* OVER */
     push(SP, get16(get16(SP) + CELLL));
     next();
     return;
 
-  case 24: // 0<
+  case 24: /* 0< */
     {
-      unsigned short test = pop(SP);
+      uint16_t test = pop(SP);
       push(SP, test & signFlag ? minus1 : 0);
 
       next();
       return;
     }
 
-  case 25: // AND
+  case 25: /* AND */
     push(SP, pop(SP) & pop(SP));
     next();
     return;
 
-  case 26: // OR
+  case 26: /* OR */
     push(SP, pop(SP) | pop(SP));
     next();
     return;
 
-  case 27: // XOR
+  case 27: /* XOR */
     push(SP, pop(SP) ^ pop(SP));
     next();
     return;
 
-  case 28: // UM+<
+  case 28: /* UM+< */
     {
-      unsigned short bx = pop(SP);
-      unsigned short ax = pop(SP) + bx;
+      uint16_t bx = pop(SP);
+      uint16_t ax = pop(SP) + bx;
 
       push(SP, ax & minus1);
       push(SP, ax >> 16);
@@ -266,7 +265,7 @@ void step() {
       return;
     }
 
-  case 29: // doLIST
+  case 29: /* doLIST */
     push(RP, get16(IP));
     set16(IP, get16(PC));
 
@@ -279,7 +278,7 @@ void step() {
   }
 }
 
-int run() {
+void run() {
   running = 1;
 
   while (running) {
@@ -290,7 +289,12 @@ int run() {
 int main() {
   FILE *ptr;
   ptr = fopen("dist/mem.bin", "rb");
-  fread(m8, sizeof(m8), 1, ptr);
+
+  if (fread(m8, sizeof(m8), 1, ptr) == 0) {
+    printf("bad mem file\n");
+    exit(1);
+  }
+
   fclose(ptr);
 
   run();
