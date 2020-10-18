@@ -9,6 +9,9 @@
 
 #define CELLL 2
 
+char test_code[] = "1 2 3 4 + + + .";
+int testi = 0;
+
 uint16_t minus1 = 65535;
 uint16_t signFlag = 32768;
 
@@ -50,7 +53,7 @@ void step() {
 
   set16(PC, pc + CELLL);
 
-  printf("OP: %u\n", op);
+  /*printf("step: %u\n", op);*/
 
   switch (op) {
   case 0: /* BYE */
@@ -58,7 +61,13 @@ void step() {
     return;
 
   case 1: /* KEY */
-    push(SP, getc(stdin));
+    if (testi == sizeof(test_code)) {
+      running = 0;
+      return;
+    }
+
+    /*push(SP, fgetc(stdin));*/
+    push(SP, test_code[testi++]);
 
     next();
     return;
@@ -92,7 +101,8 @@ void step() {
   case 6: /* next */
     {
       /* count is on the return stack */
-      uint16_t count = get16(get16(RP));
+      uint16_t rp = get16(RP);
+      uint16_t count = get16(rp);
 
       if (count == 0) {
         /* count will go below 0, pop the count, skip over address after 'next' instruction */
@@ -100,7 +110,7 @@ void step() {
         set16(IP, get16(IP) + CELLL);
       } else {
         /* otherwise set the dec'd count, point to instruction after 'next' instruction */
-        set16(RP, count - 1);
+        set16(rp, count - 1);
         set16(IP, get16(get16(IP)));
       }
 
@@ -146,17 +156,22 @@ void step() {
   case 11: /* C! */
     {
       int addr = pop(SP);
-      m8[addr] = pop(SP);
+      uint8_t value = pop(SP) & 0xff;
+      m8[addr] = value;
 
       next();
       return;
     }
 
   case 12: /* C@ */
-    push(SP, m8[pop(SP)]);
+    {
+      int addr = pop(SP);
+      uint8_t value = m8[addr];
+      push(SP, value);
 
-    next();
-    return;
+      next();
+      return;
+    }
 
   case 13: /* RP@ */
     push(SP, get16(RP));
@@ -253,13 +268,13 @@ void step() {
     next();
     return;
 
-  case 28: /* UM+< */
+  case 28: /* UM+ */
     {
-      uint16_t bx = pop(SP);
-      uint16_t ax = pop(SP) + bx;
+      uint32_t bx = pop(SP);
+      uint32_t ax = pop(SP) + bx;
 
       push(SP, ax & minus1);
-      push(SP, ax >> 16);
+      push(SP, (ax >> 16) & minus1);
 
       next();
       return;
@@ -290,7 +305,7 @@ int main() {
   FILE *ptr;
   ptr = fopen("dist/mem.bin", "rb");
 
-  if (fread(m8, sizeof(m8), 1, ptr) == 0) {
+  if (fread(m8, sizeof(m8), 1, ptr) != 1) {
     printf("bad mem file\n");
     exit(1);
   }
@@ -298,6 +313,8 @@ int main() {
   fclose(ptr);
 
   run();
+
+  printf("\n");
 
   return 0;
 }

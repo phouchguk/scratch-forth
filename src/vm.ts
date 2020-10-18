@@ -68,6 +68,7 @@ export class Vm {
     this.mem.PC += CELLL; // point to next instruction
 
     //console.log(prims[op] ? prims[op] : op);
+    console.log(`step: ${op}`);
 
     // primitive
     switch (op) {
